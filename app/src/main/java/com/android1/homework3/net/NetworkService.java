@@ -12,7 +12,8 @@ import java.io.IOException;
 import android1.homework3.INetworkService;
 
 public class NetworkService extends Service implements SocketListener {
-    public static final String ACTION_SOCKET_CONNECTED = "com.android1.homework3.ACTION_SOCKED_CONNECTED";
+    public static final String ACTION_CONNECTED = "com.android1.homework3.ACTION_CONNECTED";
+    public static final String ACTION_CONNECTION_FAILED = "com.android1.homework3.ACTION_CONNECTION_FAILED";
     public static final String ACTION_DATA_RECEIVED = "com.android1.homework3.ACTION_DATA_RECEIVED";
     private static final String HOST = "188.166.49.215";
     private static final int PORT = 7777;
@@ -56,8 +57,14 @@ public class NetworkService extends Service implements SocketListener {
     }
 
     @Override
-    public void onSocketConnected() {
-        Intent intent = new Intent(ACTION_SOCKET_CONNECTED);
+    public void onConnected() {
+        Intent intent = new Intent(ACTION_CONNECTED);
+        mLocalBroadcastManager.sendBroadcast(intent);
+    }
+
+    @Override
+    public void onConnectionFailed() {
+        Intent intent = new Intent(ACTION_CONNECTION_FAILED);
         mLocalBroadcastManager.sendBroadcast(intent);
     }
 

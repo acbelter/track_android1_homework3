@@ -1,5 +1,7 @@
 package com.android1.homework3.net;
 
+import com.android1.homework3.Logger;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -7,8 +9,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.android1.homework3.Logger;
 
 /**
  * Класс работающий с сокетом, умеет отправлять данные в сокет
@@ -48,9 +48,12 @@ public class SocketConnectionHandler implements ConnectionHandler {
             mInputStream = socket.getInputStream();
             mOutputStream = socket.getOutputStream();
             for (SocketListener listener : mListeners) {
-                listener.onSocketConnected();
+                listener.onConnected();
             }
         } catch (IOException e) {
+            for (SocketListener listener : mListeners) {
+                listener.onConnectionFailed();
+            }
             e.printStackTrace();
             Thread.currentThread().interrupt();
         }
@@ -66,6 +69,9 @@ public class SocketConnectionHandler implements ConnectionHandler {
                     }
                 }
             } catch (Exception e) {
+                for (SocketListener listener : mListeners) {
+                    listener.onConnectionFailed();
+                }
                 Logger.d("Failed to handle connection");
                 e.printStackTrace();
                 Thread.currentThread().interrupt();

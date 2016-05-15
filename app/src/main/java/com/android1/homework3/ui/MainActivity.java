@@ -1,4 +1,4 @@
-package com.android1.homework3;
+package com.android1.homework3.ui;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -12,6 +12,8 @@ import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 
+import com.android1.homework3.Logger;
+import com.android1.homework3.R;
 import com.android1.homework3.net.NetworkService;
 
 import android1.homework3.INetworkService;
@@ -35,13 +37,17 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
-                case NetworkService.ACTION_SOCKET_CONNECTED: {
+                case NetworkService.ACTION_CONNECTED: {
                     Logger.d("Connected to socket");
                     try {
                         mNetworkService.sendMessage("Message");
                     } catch (RemoteException e) {
                         e.printStackTrace();
                     }
+                    break;
+                }
+                case NetworkService.ACTION_CONNECTION_FAILED: {
+                    Logger.d("Connection failed");
                     break;
                 }
                 case NetworkService.ACTION_DATA_RECEIVED: {
@@ -70,8 +76,12 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
-        manager.registerReceiver(mNetworkServiceReceiver, new IntentFilter(NetworkService.ACTION_SOCKET_CONNECTED));
-        manager.registerReceiver(mNetworkServiceReceiver, new IntentFilter(NetworkService.ACTION_DATA_RECEIVED));
+        manager.registerReceiver(mNetworkServiceReceiver,
+                new IntentFilter(NetworkService.ACTION_CONNECTED));
+        manager.registerReceiver(mNetworkServiceReceiver,
+                new IntentFilter(NetworkService.ACTION_CONNECTION_FAILED));
+        manager.registerReceiver(mNetworkServiceReceiver,
+                new IntentFilter(NetworkService.ACTION_DATA_RECEIVED));
     }
 
     @Override

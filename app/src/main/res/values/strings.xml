@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">HomeWork3</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="repeat_password">Repeat password</string>
+    <string name="register">Register</string>
+    <string name="nickname">Nickname</string>
+    <string name="status">Status</string>
+    <string name="save">Save</string>
 </resources>
