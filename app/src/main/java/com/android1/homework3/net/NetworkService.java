@@ -25,16 +25,27 @@ public class NetworkService extends Service implements SocketListener {
     @Override
     public void onCreate() {
         super.onCreate();
+        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         try {
-            mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
             mSocketConnectionHandler = new SocketConnectionHandler(HOST, PORT);
             mSocketConnectionHandler.addListener(this);
 
             Thread thread = new Thread(mSocketConnectionHandler);
             thread.start();
         } catch (IOException e) {
+            notifyConnectionFailed();
             e.printStackTrace();
         }
+    }
+
+    private void notifyConnected() {
+        Intent intent = new Intent(ACTION_CONNECTED);
+        mLocalBroadcastManager.sendBroadcast(intent);
+    }
+
+    private void notifyConnectionFailed() {
+        Intent intent = new Intent(ACTION_CONNECTION_FAILED);
+        mLocalBroadcastManager.sendBroadcast(intent);
     }
 
     @Override
@@ -58,14 +69,12 @@ public class NetworkService extends Service implements SocketListener {
 
     @Override
     public void onConnected() {
-        Intent intent = new Intent(ACTION_CONNECTED);
-        mLocalBroadcastManager.sendBroadcast(intent);
+        notifyConnected();
     }
 
     @Override
     public void onConnectionFailed() {
-        Intent intent = new Intent(ACTION_CONNECTION_FAILED);
-        mLocalBroadcastManager.sendBroadcast(intent);
+        notifyConnectionFailed();
     }
 
     @Override
