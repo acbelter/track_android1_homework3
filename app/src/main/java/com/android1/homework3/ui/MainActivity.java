@@ -1,5 +1,6 @@
 package com.android1.homework3.ui;
 
+import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean mNetworkServiceConnected;
     private MessageParser mMessageParser;
     private MessageBuilder mMessageBuilder;
-    private FragmentRouter mFragmentRouter;
+    private FragmentController mFragmentController;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Logger.d("Network service is disconnected");
+            mFragmentController.processConnectionFailed();
         }
     };
 
@@ -50,16 +52,13 @@ public class MainActivity extends AppCompatActivity {
                 case NetworkService.ACTION_CONNECTED: {
                     mNetworkServiceConnected = true;
                     Logger.d("Connected to socket");
-                    try {
-                        mNetworkService.sendMessage("Message");
-                    } catch (RemoteException e) {
-                        e.printStackTrace();
-                    }
                     break;
                 }
                 case NetworkService.ACTION_CONNECTION_FAILED: {
                     mNetworkServiceConnected = false;
                     Logger.d("Connection failed");
+                    mFragmentController.processConnectionFailed();
+                    Toast.makeText(getApplicationContext(), R.string.toast_connection_failed, Toast.LENGTH_SHORT).show();
                     break;
                 }
                 case NetworkService.ACTION_DATA_RECEIVED: {
@@ -67,10 +66,9 @@ public class MainActivity extends AppCompatActivity {
                     Logger.d("Message received: " + data);
                     BaseMessage message = mMessageParser.parseMessage(data);
                     if (message != null) {
-                        mFragmentRouter.route(message);
+                        mFragmentController.process(message);
                     } else {
-                        Toast.makeText(getApplicationContext(),
-                                "Unknown message", Toast.LENGTH_SHORT).show();
+                        Logger.d("Unknown message");
                     }
                     break;
                 }
@@ -84,7 +82,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mMessageParser = new JSONMessageParser();
         mMessageBuilder = new JSONMessageBuilder();
-        mFragmentRouter = new FragmentRouter(this);
+        mFragmentController = new FragmentController(this);
+
+        if (savedInstanceState == null) {
+            FragmentTransaction ft = getFragmentManager().beginTransaction();
+            ft.replace(R.id.fragment_container, new SplashFragment(), SplashFragment.tag());
+            ft.commit();
+        }
     }
 
     public void sendMessage(BaseMessage data) {
@@ -100,6 +104,11 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void connectToNetworkService() {
+        Intent intent = new Intent(MainActivity.this, NetworkService.class);
+        bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
     }
 
     private void disconnect() {
@@ -130,10 +139,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (mNetworkService == null) {
-            Intent intent = new Intent(MainActivity.this, NetworkService.class);
-            bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
-        }
+        connectToNetworkService();
     }
 
     @Override

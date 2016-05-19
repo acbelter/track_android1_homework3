@@ -8,4 +8,6 @@
     <string name="nickname">Nickname</string>
     <string name="status">Status</string>
     <string name="save">Save</string>
+    <string name="toast_connection_failed">Connection failed</string>
+    <string name="reconnect">Reconnect</string>
 </resources>
