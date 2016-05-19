@@ -3,7 +3,6 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 
 /*{
     "action":"message",
@@ -19,6 +18,9 @@ public class SendRequestMessage implements BaseMessage {
     public String sid;  // session id
     public String channel;
     public String body;
+
+    public SendRequestMessage() {
+    }
 
     protected SendRequestMessage(Parcel in) {
         cid = in.readString();
@@ -50,15 +52,5 @@ public class SendRequestMessage implements BaseMessage {
         out.writeString(sid);
         out.writeString(channel);
         out.writeString(body);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.CLIENT;
-    }
-
-    @Override
-    public String getAction() {
-        return "message";
     }
 }

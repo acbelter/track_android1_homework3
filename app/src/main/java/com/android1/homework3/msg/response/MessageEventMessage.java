@@ -1,9 +1,8 @@
-package com.android1.homework3.msg.event;
+package com.android1.homework3.msg.response;
 
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 
 /*{
     "action":"ev_message",
@@ -19,6 +18,9 @@ public class MessageEventMessage implements BaseMessage {
     public String from;  // user id
     public String nick;
     public String body;
+
+    public MessageEventMessage() {
+    }
 
     protected MessageEventMessage(Parcel in) {
         chid = in.readString();
@@ -50,15 +52,5 @@ public class MessageEventMessage implements BaseMessage {
         out.writeString(from);
         out.writeString(nick);
         out.writeString(body);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.SERVER;
-    }
-
-    @Override
-    public String getAction() {
-        return "ev_message";
     }
 }

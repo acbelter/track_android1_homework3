@@ -3,7 +3,6 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 import com.android1.homework3.msg.Status;
 
 import java.util.ArrayList;
@@ -35,7 +34,7 @@ public class EnterResponseMessage implements BaseMessage {
     public Status status;
     public String error;
     public List<User> users;
-    public List<Message> lastMsg;
+    public List<LastMessage> lastMsg;
 
     public EnterResponseMessage() {
         users = new ArrayList<>();
@@ -48,7 +47,7 @@ public class EnterResponseMessage implements BaseMessage {
         users = new ArrayList<>();
         in.readTypedList(users, User.CREATOR);
         lastMsg = new ArrayList<>();
-        in.readTypedList(lastMsg, Message.CREATOR);
+        in.readTypedList(lastMsg, LastMessage.CREATOR);
     }
 
     public static final Creator<EnterResponseMessage> CREATOR = new Creator<EnterResponseMessage>() {
@@ -74,15 +73,5 @@ public class EnterResponseMessage implements BaseMessage {
         out.writeString(error);
         out.writeTypedList(users);
         out.writeTypedList(lastMsg);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.SERVER;
-    }
-
-    @Override
-    public String getAction() {
-        return "enter";
     }
 }

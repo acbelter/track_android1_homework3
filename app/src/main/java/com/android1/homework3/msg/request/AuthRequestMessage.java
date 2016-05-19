@@ -3,7 +3,6 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 
 /*{
     "action":"auth",
@@ -15,6 +14,9 @@ import com.android1.homework3.msg.SenderType;
 public class AuthRequestMessage implements BaseMessage {
     public String login;
     public String pass;
+
+    public AuthRequestMessage() {
+    }
 
     protected AuthRequestMessage(Parcel in) {
         login = in.readString();
@@ -42,15 +44,5 @@ public class AuthRequestMessage implements BaseMessage {
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(login);
         out.writeString(pass);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.CLIENT;
-    }
-
-    @Override
-    public String getAction() {
-        return "auth";
     }
 }

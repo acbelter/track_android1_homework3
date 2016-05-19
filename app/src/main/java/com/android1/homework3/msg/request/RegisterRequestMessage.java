@@ -3,7 +3,6 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 
 /*{
     "action":"register",
@@ -17,6 +16,9 @@ public class RegisterRequestMessage implements BaseMessage {
     public String login;
     public String pass;
     public String nick;
+
+    public RegisterRequestMessage() {
+    }
 
     protected RegisterRequestMessage(Parcel in) {
         login = in.readString();
@@ -46,15 +48,5 @@ public class RegisterRequestMessage implements BaseMessage {
         out.writeString(login);
         out.writeString(pass);
         out.writeString(nick);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.CLIENT;
-    }
-
-    @Override
-    public String getAction() {
-        return "register";
     }
 }

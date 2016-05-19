@@ -1,9 +1,8 @@
-package com.android1.homework3.msg.event;
+package com.android1.homework3.msg.response;
 
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 
 /*{
     "action":"ev_enter",
@@ -17,6 +16,9 @@ public class EnterEventMessage implements BaseMessage {
     public String chid; // channel id
     public String uid;  // user id
     public String nick;
+
+    public EnterEventMessage() {
+    }
 
     protected EnterEventMessage(Parcel in) {
         chid = in.readString();
@@ -46,15 +48,5 @@ public class EnterEventMessage implements BaseMessage {
         out.writeString(chid);
         out.writeString(uid);
         out.writeString(nick);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.SERVER;
-    }
-
-    @Override
-    public String getAction() {
-        return "ev_enter";
     }
 }

@@ -3,7 +3,6 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 import com.android1.homework3.msg.Status;
 
 /*{
@@ -20,6 +19,9 @@ public class AuthResponseMessage implements BaseMessage {
     public String error;
     public String sid;  // session id
     public String uid;  // user id
+
+    public AuthResponseMessage() {
+    }
 
     protected AuthResponseMessage(Parcel in) {
         status = Status.values()[in.readInt()];
@@ -51,15 +53,5 @@ public class AuthResponseMessage implements BaseMessage {
         out.writeString(error);
         out.writeString(sid);
         out.writeString(uid);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.SERVER;
-    }
-
-    @Override
-    public String getAction() {
-        return "auth";
     }
 }

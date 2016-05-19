@@ -3,7 +3,6 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 import com.android1.homework3.msg.Status;
 
 /*{
@@ -18,6 +17,9 @@ public class CreateChannelResponseMessage implements BaseMessage {
     public Status status;
     public String error;
     public String chid;
+
+    public CreateChannelResponseMessage() {
+    }
 
     protected CreateChannelResponseMessage(Parcel in) {
         status = Status.values()[in.readInt()];
@@ -47,15 +49,5 @@ public class CreateChannelResponseMessage implements BaseMessage {
         out.writeInt(status.ordinal());
         out.writeString(error);
         out.writeString(chid);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.SERVER;
-    }
-
-    @Override
-    public String getAction() {
-        return "createchannel";
     }
 }

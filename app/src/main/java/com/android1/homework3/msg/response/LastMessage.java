@@ -10,14 +10,17 @@ import android.os.Parcelable;
     "body":"TEXT_OF_MESSAGE",
     "time":UNIXTIMESTAMP_OF_MESSAGE,
 }*/
-public class Message implements Parcelable {
+public class LastMessage implements Parcelable {
     public String mid;  // message id
     public String from; // user id
     public String nick;
     public String body;
     public long time;
 
-    protected Message(Parcel in) {
+    public LastMessage() {
+    }
+
+    protected LastMessage(Parcel in) {
         mid = in.readString();
         from = in.readString();
         nick = in.readString();
@@ -25,15 +28,15 @@ public class Message implements Parcelable {
         time = in.readLong();
     }
 
-    public static final Creator<Message> CREATOR = new Creator<Message>() {
+    public static final Creator<LastMessage> CREATOR = new Creator<LastMessage>() {
         @Override
-        public Message createFromParcel(Parcel in) {
-            return new Message(in);
+        public LastMessage createFromParcel(Parcel in) {
+            return new LastMessage(in);
         }
 
         @Override
-        public Message[] newArray(int size) {
-            return new Message[size];
+        public LastMessage[] newArray(int size) {
+            return new LastMessage[size];
         }
     };
 

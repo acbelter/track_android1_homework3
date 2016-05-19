@@ -11,15 +11,25 @@ import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
 import com.android1.homework3.Logger;
 import com.android1.homework3.R;
+import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.request.JSONMessageBuilder;
+import com.android1.homework3.msg.request.MessageBuilder;
+import com.android1.homework3.msg.response.JSONMessageParser;
+import com.android1.homework3.msg.response.MessageParser;
 import com.android1.homework3.net.NetworkService;
 
 import android1.homework3.INetworkService;
 
 public class MainActivity extends AppCompatActivity {
     private INetworkService mNetworkService;
+    private boolean mNetworkServiceConnected;
+    private MessageParser mMessageParser;
+    private MessageBuilder mMessageBuilder;
+    private FragmentRouter mFragmentRouter;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -38,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case NetworkService.ACTION_CONNECTED: {
+                    mNetworkServiceConnected = true;
                     Logger.d("Connected to socket");
                     try {
                         mNetworkService.sendMessage("Message");
@@ -47,12 +58,20 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 }
                 case NetworkService.ACTION_CONNECTION_FAILED: {
+                    mNetworkServiceConnected = false;
                     Logger.d("Connection failed");
                     break;
                 }
                 case NetworkService.ACTION_DATA_RECEIVED: {
                     String data = intent.getStringExtra("data");
                     Logger.d("Message received: " + data);
+                    BaseMessage message = mMessageParser.parseMessage(data);
+                    if (message != null) {
+                        mFragmentRouter.route(message);
+                    } else {
+                        Toast.makeText(getApplicationContext(),
+                                "Unknown message", Toast.LENGTH_SHORT).show();
+                    }
                     break;
                 }
             }
@@ -63,6 +82,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        mMessageParser = new JSONMessageParser();
+        mMessageBuilder = new JSONMessageBuilder();
+        mFragmentRouter = new FragmentRouter(this);
+    }
+
+    public void sendMessage(BaseMessage data) {
+        if (mNetworkServiceConnected) {
+            try {
+                String message = mMessageBuilder.buildMessage(data);
+                if (message != null) {
+                    mNetworkService.sendMessage(message);
+                } else {
+                    Logger.d("Attempt to send unknown message");
+                }
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void disconnect() {

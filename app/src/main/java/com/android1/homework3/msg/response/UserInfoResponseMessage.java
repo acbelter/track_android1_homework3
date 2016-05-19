@@ -3,7 +3,6 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 import com.android1.homework3.msg.Status;
 
 /*{
@@ -20,6 +19,9 @@ public class UserInfoResponseMessage implements BaseMessage {
     public String error;
     public String nick;
     public String userStatus;
+
+    public UserInfoResponseMessage() {
+    }
 
     protected UserInfoResponseMessage(Parcel in) {
         status = Status.values()[in.readInt()];
@@ -51,15 +53,5 @@ public class UserInfoResponseMessage implements BaseMessage {
         out.writeString(error);
         out.writeString(nick);
         out.writeString(userStatus);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.SERVER;
-    }
-
-    @Override
-    public String getAction() {
-        return "userinfo";
     }
 }

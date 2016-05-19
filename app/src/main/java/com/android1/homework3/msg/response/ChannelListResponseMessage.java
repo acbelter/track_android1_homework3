@@ -3,7 +3,6 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 import com.android1.homework3.msg.Status;
 
 import java.util.ArrayList;
@@ -16,10 +15,10 @@ import java.util.List;
         "error":"TEXT_OF_ERROR",
         "channels":[
             {
-            "chid":"NEED_CHANNEL_ID",
-            "name":"NAME_OF_CHANNEL",
-            "descr":"DESCRIPTION_OF_CHANNEL",
-            "online":ONLINE_NUM,
+                "chid":"NEED_CHANNEL_ID",
+                "name":"NAME_OF_CHANNEL",
+                "descr":"DESCRIPTION_OF_CHANNEL",
+                "online":ONLINE_NUM,
             }, ....
         ]
     }
@@ -62,15 +61,5 @@ public class ChannelListResponseMessage implements BaseMessage {
         out.writeInt(status.ordinal());
         out.writeString(error);
         out.writeTypedList(channels);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.SERVER;
-    }
-
-    @Override
-    public String getAction() {
-        return "channellist";
     }
 }

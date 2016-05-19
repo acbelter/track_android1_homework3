@@ -3,7 +3,6 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 
 /*{
     "action":"userinfo",
@@ -17,6 +16,9 @@ public class UserInfoRequestMessage implements BaseMessage {
     public String user;
     public String cid;  // client id
     public String sid;  // session id
+
+    public UserInfoRequestMessage() {
+    }
 
     protected UserInfoRequestMessage(Parcel in) {
         user = in.readString();
@@ -46,15 +48,5 @@ public class UserInfoRequestMessage implements BaseMessage {
         out.writeString(user);
         out.writeString(cid);
         out.writeString(sid);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.CLIENT;
-    }
-
-    @Override
-    public String getAction() {
-        return "userinfo";
     }
 }

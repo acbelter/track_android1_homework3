@@ -3,7 +3,6 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 
 /*{
     "action":"createchannel",
@@ -19,6 +18,9 @@ public class CreateChannelRequestMessage implements BaseMessage {
     public String sid;  // session id
     public String name;
     public String descr;
+
+    public CreateChannelRequestMessage() {
+    }
 
     protected CreateChannelRequestMessage(Parcel in) {
         cid = in.readString();
@@ -50,15 +52,5 @@ public class CreateChannelRequestMessage implements BaseMessage {
         out.writeString(sid);
         out.writeString(name);
         out.writeString(descr);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.CLIENT;
-    }
-
-    @Override
-    public String getAction() {
-        return "createchannel";
     }
 }

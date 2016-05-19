@@ -15,6 +15,9 @@ public class Channel implements Parcelable {
     public String descr;
     public int online; // online users count
 
+    public Channel() {
+    }
+
     protected Channel(Parcel in) {
         chid = in.readString();
         name = in.readString();

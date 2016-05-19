@@ -3,7 +3,6 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
-import com.android1.homework3.msg.SenderType;
 
 /*{
     "action":"leave",
@@ -17,6 +16,9 @@ public class LeaveRequestMessage implements BaseMessage {
     public String cid;  // client id
     public String sid;  // session id
     public String channel;
+
+    public LeaveRequestMessage() {
+    }
 
     protected LeaveRequestMessage(Parcel in) {
         cid = in.readString();
@@ -46,15 +48,5 @@ public class LeaveRequestMessage implements BaseMessage {
         out.writeString(cid);
         out.writeString(sid);
         out.writeString(channel);
-    }
-
-    @Override
-    public SenderType getSenderType() {
-        return SenderType.CLIENT;
-    }
-
-    @Override
-    public String getAction() {
-        return "leave";
     }
 }
