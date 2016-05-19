@@ -47,6 +47,13 @@ public class SocketConnectionHandler implements ConnectionHandler {
             socket = new Socket(mHost, mPort);
             mInputStream = socket.getInputStream();
             mOutputStream = socket.getOutputStream();
+
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             for (SocketListener listener : mListeners) {
                 listener.onConnected();
             }

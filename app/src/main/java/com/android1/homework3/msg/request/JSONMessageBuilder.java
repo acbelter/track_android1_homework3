@@ -1,5 +1,6 @@
 package com.android1.homework3.msg.request;
 
+import com.android1.homework3.Logger;
 import com.android1.homework3.msg.BaseMessage;
 import com.android1.homework3.msg.MessageAction;
 
@@ -9,6 +10,7 @@ import org.json.JSONObject;
 public class JSONMessageBuilder implements MessageBuilder {
     @Override
     public String buildMessage(BaseMessage data) {
+        Logger.d("Build message for action " + data.getAction());
         try {
             switch (data.getAction()) {
                 case MessageAction.AUTH: {
@@ -53,7 +55,7 @@ public class JSONMessageBuilder implements MessageBuilder {
         data.put("login", message.login);
         data.put("pass", message.pass);
         json.put("data", data);
-        return null;
+        return json.toString();
     }
 
     private String buildChannelListMessage(ChannelListRequestMessage message) throws JSONException {
@@ -64,7 +66,7 @@ public class JSONMessageBuilder implements MessageBuilder {
         data.put("cid", message.cid);
         data.put("sid", message.sid);
         json.put("data", data);
-        return null;
+        return json.toString();
     }
 
     private String buildCreateChannelMessage(CreateChannelRequestMessage message) throws JSONException {
@@ -77,7 +79,7 @@ public class JSONMessageBuilder implements MessageBuilder {
         data.put("name", message.name);
         data.put("descr", message.descr);
         json.put("data", data);
-        return null;
+        return json.toString();
     }
 
     private String buildEnterMessage(EnterRequestMessage message) throws JSONException {
@@ -89,7 +91,7 @@ public class JSONMessageBuilder implements MessageBuilder {
         data.put("sid", message.sid);
         data.put("channel", message.channel);
         json.put("data", data);
-        return null;
+        return json.toString();
     }
 
     private String buildLeaveMessage(LeaveRequestMessage message) throws JSONException {
@@ -101,7 +103,7 @@ public class JSONMessageBuilder implements MessageBuilder {
         data.put("sid", message.sid);
         data.put("channel", message.channel);
         json.put("data", data);
-        return null;
+        return json.toString();
     }
 
     private String buildRegisterMessage(RegisterRequestMessage message) throws JSONException {
@@ -113,7 +115,7 @@ public class JSONMessageBuilder implements MessageBuilder {
         data.put("pass", message.pass);
         data.put("nick", message.nick);
         json.put("data", data);
-        return null;
+        return json.toString();
     }
 
     private String buildSendMessage(SendRequestMessage message) throws JSONException {
@@ -126,7 +128,7 @@ public class JSONMessageBuilder implements MessageBuilder {
         data.put("channel", message.channel);
         data.put("body", message.body);
         json.put("data", data);
-        return null;
+        return json.toString();
     }
 
     private String buildSetUserInfoMessage(SetUserInfoRequestMessage message) throws JSONException {
@@ -138,7 +140,7 @@ public class JSONMessageBuilder implements MessageBuilder {
         data.put("cid", message.cid);
         data.put("sid", message.sid);
         json.put("data", data);
-        return null;
+        return json.toString();
     }
 
     private String buildUserInfoMessage(UserInfoRequestMessage message) throws JSONException {
@@ -150,6 +152,6 @@ public class JSONMessageBuilder implements MessageBuilder {
         data.put("cid", message.cid);
         data.put("sid", message.sid);
         json.put("data", data);
-        return null;
+        return json.toString();
     }
 }

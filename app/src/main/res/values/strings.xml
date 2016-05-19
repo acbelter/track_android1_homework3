@@ -11,4 +11,7 @@
     <string name="reconnect">Reconnect</string>
     <string name="toast_empty_login">Login is empty</string>
     <string name="toast_empty_pass">Password is empty</string>
+    <string name="toast_login_already_exists">This login already exists</string>
+    <string name="toast_invalid_pass">Invalid password</string>
+    <string name="toast_need_register">Need registration</string>
 </resources>

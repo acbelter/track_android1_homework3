@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Logger.d("Network service is disconnected");
-            mController.processConnectionFailed();
+            mController.processConnectionFailed(true);
         }
     };
 
@@ -51,14 +51,14 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case NetworkService.ACTION_CONNECTED: {
-                    mNetworkServiceConnected = true;
                     Logger.d("Connected to socket");
+                    mNetworkServiceConnected = true;
                     break;
                 }
                 case NetworkService.ACTION_CONNECTION_FAILED: {
-                    mNetworkServiceConnected = false;
                     Logger.d("Connection failed");
-                    mController.processConnectionFailed();
+                    mNetworkServiceConnected = false;
+                    mController.processConnectionFailed(false);
                     Toast.makeText(getApplicationContext(), R.string.toast_connection_failed, Toast.LENGTH_SHORT).show();
                     break;
                 }
@@ -70,6 +70,8 @@ public class MainActivity extends AppCompatActivity {
                         mController.processResponse(message);
                     } else {
                         Logger.d("Unknown message");
+                        mNetworkServiceConnected = false;
+                        mController.processConnectionFailed(true);
                     }
                     break;
                 }
@@ -92,6 +94,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void sendTestMessage() {
+        try {
+            mNetworkService.sendMessage("BLABLA");
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
+
     public void sendMessage(BaseMessage message) {
         if (mNetworkServiceConnected) {
             try {
@@ -99,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
                 if (messageData != null) {
                     mNetworkService.sendMessage(messageData);
                 } else {
-                    Logger.d("Attempt to send unknown message");
+                    Logger.d("Attempt to send unknown message for class " + message.getClass().getSimpleName());
                 }
             } catch (RemoteException e) {
                 e.printStackTrace();

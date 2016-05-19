@@ -72,8 +72,8 @@ public class JSONMessageParser implements MessageParser {
 
         message.status = Status.values()[data.getInt("status")];
         message.error = data.optString("error");
-        message.sid = data.getString("sid");
-        message.uid = data.getString("uid");
+        message.sid = data.optString("sid");
+        message.uid = data.optString("uid");
         return message;
     }
 
@@ -110,7 +110,7 @@ public class JSONMessageParser implements MessageParser {
 
         message.status = Status.values()[data.getInt("status")];
         message.error = data.optString("error");
-        message.chid = data.getString("chid");
+        message.chid = data.optString("chid");
         return message;
     }
 
@@ -221,8 +221,8 @@ public class JSONMessageParser implements MessageParser {
 
         message.status = Status.values()[data.getInt("status")];
         message.error = data.optString("error");
-        message.nick = data.getString("nick");
-        message.userStatus = data.getString("user_status");
+        message.nick = data.optString("nick");
+        message.userStatus = data.optString("user_status");
         return message;
     }
 

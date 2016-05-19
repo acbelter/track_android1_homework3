@@ -15,6 +15,19 @@ public class RegisterFragment extends UiFragment {
     private EditText mPassword;
     private EditText mRepeatPassword;
     private Button mRegisterButton;
+    private Controller mController;
+
+    public static RegisterFragment newInstance(Controller controller) {
+        RegisterFragment fragment = new RegisterFragment();
+        fragment.mController = controller;
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
 
     @Nullable
     @Override

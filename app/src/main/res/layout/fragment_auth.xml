@@ -3,7 +3,8 @@
               xmlns:tools="http://schemas.android.com/tools"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:layout_margin="@dimen/big_margin"
+              android:layout_marginLeft="@dimen/big_margin"
+              android:layout_marginRight="@dimen/big_margin"
               android:orientation="vertical">
 
     <Space

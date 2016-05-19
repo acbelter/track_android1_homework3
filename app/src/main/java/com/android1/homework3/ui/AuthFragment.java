@@ -24,6 +24,12 @@ public class AuthFragment extends UiFragment {
         return fragment;
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -56,7 +62,7 @@ public class AuthFragment extends UiFragment {
         mRegisterButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                mController.showRegisterFragment();
             }
         });
 
@@ -68,6 +74,7 @@ public class AuthFragment extends UiFragment {
         mLogin.setEnabled(enabled);
         mPassword.setEnabled(enabled);
         mLoginButton.setEnabled(enabled);
+        mRegisterButton.setEnabled(enabled);
     }
 
     public static String tag() {
