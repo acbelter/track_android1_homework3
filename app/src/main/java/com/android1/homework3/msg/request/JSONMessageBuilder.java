@@ -10,7 +10,7 @@ import org.json.JSONObject;
 public class JSONMessageBuilder implements MessageBuilder {
     @Override
     public String buildMessage(BaseMessage data) {
-        Logger.d("Build message for action " + data.getAction());
+        Logger.d("Build message for action: " + data.getAction());
         try {
             switch (data.getAction()) {
                 case MessageAction.AUTH: {

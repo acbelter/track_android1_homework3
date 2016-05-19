@@ -33,8 +33,8 @@ public class ReconnectFragment extends UiFragment {
         mReconnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setUiEnabled(false);
                 mController.connectToNetworkService();
+                mController.showSplashFragment();
             }
         });
 

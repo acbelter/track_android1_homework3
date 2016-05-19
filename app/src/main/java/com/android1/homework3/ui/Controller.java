@@ -14,7 +14,9 @@ import com.android1.homework3.R;
 import com.android1.homework3.msg.BaseMessage;
 import com.android1.homework3.msg.MessageAction;
 import com.android1.homework3.msg.request.AuthRequestMessage;
+import com.android1.homework3.msg.request.RegisterRequestMessage;
 import com.android1.homework3.msg.response.AuthResponseMessage;
+import com.android1.homework3.msg.response.RegisterResponseMessage;
 import com.android1.homework3.msg.response.WelcomeMessage;
 
 import java.lang.ref.WeakReference;
@@ -36,15 +38,6 @@ public final class Controller {
         mMainActivityWeakRef = new WeakReference<>(mainActivity);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
         mFirstWelcome = true;
-    }
-
-    public void sendMessage() {
-        MainActivity mainActivity = mMainActivityWeakRef.get();
-        if (mainActivity == null) {
-            return;
-        }
-
-        mainActivity.sendTestMessage();
     }
 
     public void processResponse(BaseMessage message) {
@@ -75,6 +68,7 @@ public final class Controller {
                 break;
             }
             case MessageAction.REGISTER: {
+                processRegisterMessage((RegisterResponseMessage) message);
                 break;
             }
             case MessageAction.SET_USER_INFO: {
@@ -194,6 +188,62 @@ public final class Controller {
         }
     }
 
+    private void processRegisterMessage(RegisterResponseMessage message) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        switch (message.status) {
+            case ERR_OK: {
+                // TODO
+                Logger.d("Successful registration");
+                break;
+            }
+            case ERR_ALREADY_EXIST: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_login_already_exists, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_INVALID_PASS: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_invalid_pass, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_INVALID_DATA: {
+                break;
+            }
+            case ERR_EMPTY_FIELD: {
+                break;
+            }
+            case ERR_ALREADY_REGISTER: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_login_already_exists, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_NEED_AUTH: {
+                break;
+            }
+            case ERR_NEED_REGISTER: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_need_register, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_USER_NOT_FOUND: {
+                break;
+            }
+            case ERR_CHANNEL_NOT_FOUND: {
+                break;
+            }
+            case ERR_INVALID_CHANNEL: {
+                break;
+            }
+        }
+    }
 
     public void processConnectionFailed(boolean silent) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
@@ -236,6 +286,28 @@ public final class Controller {
         authRequestMessage.login = login;
         authRequestMessage.pass = HashUtil.generateHash(pass);
         mainActivity.sendMessage(authRequestMessage);
+    }
+
+    public void startRegistration(String login, String nick, String pass) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        RegisterRequestMessage registerRequestMessage = new RegisterRequestMessage();
+        registerRequestMessage.login = login;
+        registerRequestMessage.nick = nick;
+        registerRequestMessage.pass = HashUtil.generateHash(pass);
+        mainActivity.sendMessage(registerRequestMessage);
+    }
+
+    public void showSplashFragment() {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+        replaceFragment(mainActivity, new SplashFragment(),
+                SplashFragment.tag(), false);
     }
 
     public void showAuthFragment() {

@@ -2,6 +2,7 @@ package com.android1.homework3.ui;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.text.InputFilter;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android1.homework3.R;
+import com.android1.homework3.msg.NoSpaceFilter;
 
 public class AuthFragment extends UiFragment {
     private Controller mController;
@@ -38,6 +40,10 @@ public class AuthFragment extends UiFragment {
         mPassword = (EditText) view.findViewById(R.id.password);
         mLoginButton = (Button) view.findViewById(R.id.btn_login);
         mRegisterButton = (Button) view.findViewById(R.id.btn_register);
+
+        mLogin.setFilters(new InputFilter[] {new NoSpaceFilter()});
+        mPassword.setFilters(new InputFilter[] {new NoSpaceFilter()});
+
         mLoginButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

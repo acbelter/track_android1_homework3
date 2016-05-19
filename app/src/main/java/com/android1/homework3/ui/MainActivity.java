@@ -94,19 +94,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void sendTestMessage() {
-        try {
-            mNetworkService.sendMessage("BLABLA");
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void sendMessage(BaseMessage message) {
         if (mNetworkServiceConnected) {
             try {
                 String messageData = mMessageBuilder.buildMessage(message);
                 if (messageData != null) {
+                    Logger.d("Send message: " + messageData);
                     mNetworkService.sendMessage(messageData);
                 } else {
                     Logger.d("Attempt to send unknown message for class " + message.getClass().getSimpleName());
