@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
+            Logger.d("Connected to network service");
             mNetworkService = INetworkService.Stub.asInterface(service);
         }
 
@@ -66,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
                     Logger.d("Message received: " + data);
                     BaseMessage message = mMessageParser.parseMessage(data);
                     if (message != null) {
-                        mController.process(message);
+                        mController.processResponse(message);
                     } else {
                         Logger.d("Unknown message");
                     }
@@ -107,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void connectToNetworkService() {
+        Logger.d("Connect to network service");
+        disconnect();
         Intent intent = new Intent(MainActivity.this, NetworkService.class);
         bindService(intent, mServiceConnection, BIND_AUTO_CREATE);
     }

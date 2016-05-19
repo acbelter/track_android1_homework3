@@ -4,6 +4,7 @@ import android.content.SharedPreferences;
 
 public class Pref {
     private static final String KEY_LOGIN = "login";
+    private static final String KEY_PASS = "pass";
     private static final String KEY_USER_ID = "user_id";
     private static final String KEY_SESSION_ID = "session_id";
 
@@ -13,6 +14,14 @@ public class Pref {
 
     public static String loadLogin(SharedPreferences prefs) {
         return prefs.getString(KEY_LOGIN, null);
+    }
+
+    public static void savePass(SharedPreferences prefs, String pass) {
+        prefs.edit().putString(KEY_PASS, pass).apply();
+    }
+
+    public static String loadPass(SharedPreferences prefs) {
+        return prefs.getString(KEY_PASS, null);
     }
 
     public static void saveUserId(SharedPreferences prefs, String userId) {
@@ -32,6 +41,6 @@ public class Pref {
     }
 
     public static boolean isLoggedIn(SharedPreferences prefs) {
-        return prefs.contains(KEY_USER_ID) && prefs.contains(KEY_SESSION_ID);
+        return prefs.contains(KEY_LOGIN) && prefs.contains(KEY_PASS);
     }
 }
