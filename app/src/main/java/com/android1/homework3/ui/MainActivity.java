@@ -30,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private boolean mNetworkServiceConnected;
     private MessageParser mMessageParser;
     private MessageBuilder mMessageBuilder;
-    private FragmentController mFragmentController;
+    private Controller mController;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -41,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Logger.d("Network service is disconnected");
-            mFragmentController.processConnectionFailed();
+            mController.processConnectionFailed();
         }
     };
 
@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 case NetworkService.ACTION_CONNECTION_FAILED: {
                     mNetworkServiceConnected = false;
                     Logger.d("Connection failed");
-                    mFragmentController.processConnectionFailed();
+                    mController.processConnectionFailed();
                     Toast.makeText(getApplicationContext(), R.string.toast_connection_failed, Toast.LENGTH_SHORT).show();
                     break;
                 }
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                     Logger.d("Message received: " + data);
                     BaseMessage message = mMessageParser.parseMessage(data);
                     if (message != null) {
-                        mFragmentController.process(message);
+                        mController.process(message);
                     } else {
                         Logger.d("Unknown message");
                     }
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mMessageParser = new JSONMessageParser();
         mMessageBuilder = new JSONMessageBuilder();
-        mFragmentController = new FragmentController(this);
+        mController = new Controller(this);
 
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();

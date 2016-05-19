@@ -3,6 +3,7 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 
 /*{
     "action":"register",
@@ -48,5 +49,10 @@ public class RegisterRequestMessage implements BaseMessage {
         out.writeString(login);
         out.writeString(pass);
         out.writeString(nick);
+    }
+
+    @Override
+    public String getAction() {
+        return MessageAction.REGISTER;
     }
 }

@@ -3,6 +3,7 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 
 /*{
     "action":"ev_enter",
@@ -48,5 +49,10 @@ public class EnterEventMessage implements BaseMessage {
         out.writeString(chid);
         out.writeString(uid);
         out.writeString(nick);
+    }
+
+    @Override
+    public String getAction() {
+        return MessageAction.EVENT_ENTER;
     }
 }

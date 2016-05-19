@@ -3,6 +3,7 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 import com.android1.homework3.msg.Status;
 
 /*{
@@ -53,5 +54,10 @@ public class UserInfoResponseMessage implements BaseMessage {
         out.writeString(error);
         out.writeString(nick);
         out.writeString(userStatus);
+    }
+
+    @Override
+    public String getAction() {
+        return MessageAction.USER_INFO;
     }
 }

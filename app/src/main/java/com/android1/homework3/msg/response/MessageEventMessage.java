@@ -3,6 +3,7 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 
 /*{
     "action":"ev_message",
@@ -52,5 +53,10 @@ public class MessageEventMessage implements BaseMessage {
         out.writeString(from);
         out.writeString(nick);
         out.writeString(body);
+    }
+
+    @Override
+    public String getAction() {
+        return MessageAction.EVENT_MESSAGE;
     }
 }

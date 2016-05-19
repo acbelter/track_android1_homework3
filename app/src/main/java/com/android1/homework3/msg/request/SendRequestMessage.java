@@ -3,6 +3,7 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 
 /*{
     "action":"message",
@@ -52,5 +53,10 @@ public class SendRequestMessage implements BaseMessage {
         out.writeString(sid);
         out.writeString(channel);
         out.writeString(body);
+    }
+
+    @Override
+    public String getAction() {
+        return MessageAction.SEND_MESSAGE;
     }
 }

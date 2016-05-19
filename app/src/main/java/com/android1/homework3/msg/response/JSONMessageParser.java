@@ -1,6 +1,7 @@
 package com.android1.homework3.msg.response;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 import com.android1.homework3.msg.Status;
 
 import org.json.JSONArray;
@@ -22,40 +23,40 @@ public class JSONMessageParser implements MessageParser {
 
             String action = json.getString("action");
             switch (action) {
-                case "auth": {
+                case MessageAction.AUTH: {
                     return parseAuthMessage(json);
                 }
-                case "channellist": {
+                case MessageAction.CHANNEL_LIST: {
                     return parseChannelListMessage(json);
                 }
-                case "createchannel": {
+                case MessageAction.CREATE_CHANNEL: {
                     return parseCreateChannelMessage(json);
                 }
-                case "ev_enter": {
+                case MessageAction.EVENT_ENTER: {
                     return parseEnterEventMessage(json);
                 }
-                case "enter": {
+                case MessageAction.ENTER: {
                     return parseEnterMessage(json);
                 }
-                case "ev_leave": {
+                case MessageAction.EVENT_LEAVE: {
                     return parseLeaveEventMessage(json);
                 }
-                case "leave": {
+                case MessageAction.LEAVE: {
                     return parseLeaveMessage(json);
                 }
-                case "ev_message": {
+                case MessageAction.EVENT_MESSAGE: {
                     return parseMessageEventMessage(json);
                 }
-                case "register": {
+                case MessageAction.REGISTER: {
                     return parseRegisterMessage(json);
                 }
-                case "setuserinfo": {
+                case MessageAction.SET_USER_INFO: {
                     return parseSetUserInfoMessage(json);
                 }
-                case "userinfo": {
+                case MessageAction.USER_INFO: {
                     return parseUserInfoMessage(json);
                 }
-                case "welcome": {
+                case MessageAction.WELCOME: {
                     return parseWelcomeMessage(json);
                 }
             }

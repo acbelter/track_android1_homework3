@@ -3,6 +3,7 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 
 /*{
     "action":"userinfo",
@@ -48,5 +49,10 @@ public class UserInfoRequestMessage implements BaseMessage {
         out.writeString(user);
         out.writeString(cid);
         out.writeString(sid);
+    }
+
+    @Override
+    public String getAction() {
+        return MessageAction.USER_INFO;
     }
 }

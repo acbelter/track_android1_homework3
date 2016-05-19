@@ -3,6 +3,7 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 import com.android1.homework3.msg.Status;
 
 /*{
@@ -45,5 +46,10 @@ public class RegisterResponseMessage implements BaseMessage {
     public void writeToParcel(Parcel out, int flags) {
         out.writeInt(status.ordinal());
         out.writeString(error);
+    }
+
+    @Override
+    public String getAction() {
+        return MessageAction.REGISTER;
     }
 }

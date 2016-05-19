@@ -3,6 +3,7 @@ package com.android1.homework3.msg.request;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 
 /*{
     "action":"createchannel",
@@ -52,5 +53,10 @@ public class CreateChannelRequestMessage implements BaseMessage {
         out.writeString(sid);
         out.writeString(name);
         out.writeString(descr);
+    }
+
+    @Override
+    public String getAction() {
+        return MessageAction.CREATE_CHANNEL;
     }
 }

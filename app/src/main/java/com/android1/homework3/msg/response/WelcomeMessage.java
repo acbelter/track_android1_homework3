@@ -3,6 +3,7 @@ package com.android1.homework3.msg.response;
 import android.os.Parcel;
 
 import com.android1.homework3.msg.BaseMessage;
+import com.android1.homework3.msg.MessageAction;
 
 /*{
     "action":"welcome",
@@ -42,5 +43,10 @@ public class WelcomeMessage implements BaseMessage {
     public void writeToParcel(Parcel out, int flags) {
         out.writeString(message);
         out.writeLong(time);
+    }
+
+    @Override
+    public String getAction() {
+        return MessageAction.WELCOME;
     }
 }
