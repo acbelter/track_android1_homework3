@@ -92,12 +92,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void sendMessage(BaseMessage data) {
+    public void sendMessage(BaseMessage message) {
         if (mNetworkServiceConnected) {
             try {
-                String message = mMessageBuilder.buildMessage(data);
-                if (message != null) {
-                    mNetworkService.sendMessage(message);
+                String messageData = mMessageBuilder.buildMessage(message);
+                if (messageData != null) {
+                    mNetworkService.sendMessage(messageData);
                 } else {
                     Logger.d("Attempt to send unknown message");
                 }

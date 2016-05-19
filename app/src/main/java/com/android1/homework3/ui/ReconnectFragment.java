@@ -1,6 +1,5 @@
 package com.android1.homework3.ui;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -10,7 +9,7 @@ import android.widget.Button;
 
 import com.android1.homework3.R;
 
-public class ReconnectFragment extends Fragment {
+public class ReconnectFragment extends UiFragment {
     private Button mReconnectButton;
     private Controller mController;
 
@@ -28,12 +27,17 @@ public class ReconnectFragment extends Fragment {
         mReconnectButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mReconnectButton.setEnabled(false);
+                setUiEnabled(false);
                 mController.connectToNetworkService();
             }
         });
 
         return view;
+    }
+
+    @Override
+    public void setUiEnabled(boolean enabled) {
+        mReconnectButton.setEnabled(enabled);
     }
 
     public static String tag() {

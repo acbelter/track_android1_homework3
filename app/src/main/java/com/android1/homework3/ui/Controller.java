@@ -5,6 +5,7 @@ import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.android1.homework3.HashUtil;
 import com.android1.homework3.Pref;
 import com.android1.homework3.R;
 import com.android1.homework3.msg.BaseMessage;
@@ -83,7 +84,7 @@ public final class Controller {
             authRequestMessage.pass = Pref.loadPass(mPrefs);
             mainActivity.sendMessage(authRequestMessage);
         } else {
-            replaceFragment(mainActivity, new AuthFragment(), AuthFragment.tag());
+            replaceFragment(mainActivity, AuthFragment.newInstance(this), AuthFragment.tag());
         }
     }
 
@@ -92,7 +93,6 @@ public final class Controller {
         if (mainActivity == null) {
             return;
         }
-
         replaceFragment(mainActivity, ReconnectFragment.newInstance(this), ReconnectFragment.tag());
     }
 
@@ -102,5 +102,17 @@ public final class Controller {
             return;
         }
         mainActivity.connectToNetworkService();
+    }
+
+    public void startAuthorization(String login, String pass) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        AuthRequestMessage authRequestMessage = new AuthRequestMessage();
+        authRequestMessage.login = login;
+        authRequestMessage.pass = HashUtil.generateHash(pass);
+        mainActivity.sendMessage(authRequestMessage);
     }
 }
