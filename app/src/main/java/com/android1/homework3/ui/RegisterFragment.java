@@ -1,5 +1,6 @@
 package com.android1.homework3.ui;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.text.InputFilter;
@@ -13,7 +14,7 @@ import android.widget.Toast;
 import com.android1.homework3.R;
 import com.android1.homework3.msg.NoSpaceFilter;
 
-public class RegisterFragment extends UiFragment {
+public class RegisterFragment extends Fragment implements UiFragment {
     private EditText mLogin;
     private EditText mNickname;
     private EditText mPassword;
@@ -77,7 +78,7 @@ public class RegisterFragment extends UiFragment {
                 }
 
                 setUiEnabled(false);
-                mController.startRegistration(login, nick, pass);
+                mController.register(login, nick, pass);
             }
         });
 

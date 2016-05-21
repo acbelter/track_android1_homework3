@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onServiceDisconnected(ComponentName name) {
             Logger.d("Network service is disconnected");
-            mController.processConnectionFailed(true);
+            mController.processConnectionFailed();
         }
     };
 
@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
                 case NetworkService.ACTION_CONNECTION_FAILED: {
                     Logger.d("Connection failed");
                     mNetworkServiceConnected = false;
-                    mController.processConnectionFailed(false);
+                    mController.processConnectionFailed();
                     Toast.makeText(getApplicationContext(), R.string.toast_connection_failed, Toast.LENGTH_SHORT).show();
                     break;
                 }
@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
                     } else {
                         Logger.d("Unknown message");
                         mNetworkServiceConnected = false;
-                        mController.processConnectionFailed(true);
+                        mController.processConnectionFailed();
                     }
                     break;
                 }

@@ -15,30 +15,36 @@ import com.android1.homework3.msg.BaseMessage;
 import com.android1.homework3.msg.MessageAction;
 import com.android1.homework3.msg.Status;
 import com.android1.homework3.msg.request.AuthRequestMessage;
+import com.android1.homework3.msg.request.ChannelListRequestMessage;
 import com.android1.homework3.msg.request.RegisterRequestMessage;
 import com.android1.homework3.msg.response.AuthResponseMessage;
+import com.android1.homework3.msg.response.Channel;
+import com.android1.homework3.msg.response.ChannelListResponseMessage;
 import com.android1.homework3.msg.response.RegisterResponseMessage;
 import com.android1.homework3.msg.response.WelcomeMessage;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 public final class Controller {
     private WeakReference<MainActivity> mMainActivityWeakRef;
     private SharedPreferences mPrefs;
-    private boolean mFirstWelcome;
+//    private boolean mFirstWelcome;
 
     private static String[] sUiFragmentTags = new String[] {
             AuthFragment.tag(),
             ChangeInfoFragment.tag(),
-            ReconnectFragment.tag(),
+//            ReconnectFragment.tag(),
             RegisterFragment.tag(),
-            UserInfoFragment.tag()
+            UserInfoFragment.tag(),
+            ChannelListFragment.tag(),
+            ChannelFragment.tag()
     };
 
     public Controller(MainActivity mainActivity) {
         mMainActivityWeakRef = new WeakReference<>(mainActivity);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
-        mFirstWelcome = true;
+//        mFirstWelcome = true;
     }
 
     public void processResponse(BaseMessage message) {
@@ -48,6 +54,7 @@ public final class Controller {
                 break;
             }
             case MessageAction.CHANNEL_LIST: {
+                processChannelListMessage((ChannelListResponseMessage) message);
                 break;
             }
             case MessageAction.CREATE_CHANNEL: {
@@ -95,7 +102,7 @@ public final class Controller {
         ft.commit();
     }
 
-    private void enableUi() {
+    private void setUiEnabled(boolean enabled) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
@@ -105,18 +112,14 @@ public final class Controller {
         Fragment fragment;
         for (String tag : sUiFragmentTags) {
             fragment = fragmentManager.findFragmentByTag(tag);
-            if (fragment instanceof UiFragment) {
+            if (fragment instanceof UiFragment && fragment.isAdded()) {
                 ((UiFragment) fragment).setUiEnabled(true);
             }
         }
-
     }
 
     private void processWelcomeMessage(WelcomeMessage message) {
-        if (!mFirstWelcome) {
-            enableUi();
-            return;
-        }
+        setUiEnabled(true);
 
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
@@ -129,10 +132,8 @@ public final class Controller {
             authRequestMessage.pass = Pref.loadPass(mPrefs);
             mainActivity.sendMessage(authRequestMessage);
         } else {
-            showAuthFragment();
+            showAuthFragment(false);
         }
-
-        mFirstWelcome = false;
     }
 
     private void processAuthMessage(AuthResponseMessage message) {
@@ -147,10 +148,10 @@ public final class Controller {
 
         switch (message.status) {
             case ERR_OK: {
-                // TODO
                 Logger.d("Successful authorization");
                 Pref.saveUserId(mPrefs, message.uid);
                 Pref.saveSessionId(mPrefs, message.sid);
+                getChannelList(message.uid, message.sid);
                 break;
             }
             case ERR_ALREADY_EXIST: {
@@ -255,94 +256,151 @@ public final class Controller {
         }
     }
 
-    public void processConnectionFailed(boolean silent) {
+    private void processChannelListMessage(ChannelListResponseMessage message) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
 
-        if (silent) {
-            mainActivity.connectToNetworkService();
-        } else {
-            showReconnectFragment();
+        switch (message.status) {
+            case ERR_OK: {
+                Logger.d("Successful getting channel list");
+                showChannelListFragment(message.channels, false);
+                break;
+            }
+            case ERR_ALREADY_EXIST: {
+                break;
+            }
+            case ERR_INVALID_PASS: {
+                break;
+            }
+            case ERR_INVALID_DATA: {
+                break;
+            }
+            case ERR_EMPTY_FIELD: {
+                break;
+            }
+            case ERR_ALREADY_REGISTER: {
+                break;
+            }
+            case ERR_NEED_AUTH: {
+                showAuthFragment(false);
+                break;
+            }
+            case ERR_NEED_REGISTER: {
+                showRegisterFragment(false);
+                break;
+            }
+            case ERR_USER_NOT_FOUND: {
+                break;
+            }
+            case ERR_CHANNEL_NOT_FOUND: {
+                break;
+            }
+            case ERR_INVALID_CHANNEL: {
+                break;
+            }
         }
     }
 
-    public void connectToNetworkService() {
+    public void processConnectionFailed() {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
+
+        setUiEnabled(false);
         mainActivity.connectToNetworkService();
     }
 
-    public void showReconnectFragment() {
-        mFirstWelcome = false;
-        MainActivity mainActivity = mMainActivityWeakRef.get();
-        if (mainActivity == null) {
-            return;
-        }
-        replaceFragment(mainActivity, ReconnectFragment.newInstance(this),
-                ReconnectFragment.tag(), false);
-    }
-
-    public void startAuthorization(String login, String pass) {
+    public void authorize(String login, String pass) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
 
-        AuthRequestMessage authRequestMessage = new AuthRequestMessage();
-        authRequestMessage.login = login;
-        authRequestMessage.pass = HashUtil.generateHash(pass);
+        AuthRequestMessage authMessage = new AuthRequestMessage();
+        authMessage.login = login;
+        authMessage.pass = HashUtil.generateHash(pass);
 
-        Pref.saveLogin(mPrefs, authRequestMessage.login);
-        Pref.savePass(mPrefs, authRequestMessage.pass);
+        Pref.saveLogin(mPrefs, authMessage.login);
+        Pref.savePass(mPrefs, authMessage.pass);
 
-        mainActivity.sendMessage(authRequestMessage);
+        mainActivity.sendMessage(authMessage);
     }
 
-    public void startRegistration(String login, String nick, String pass) {
+    public void register(String login, String nick, String pass) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
 
-        RegisterRequestMessage registerRequestMessage = new RegisterRequestMessage();
-        registerRequestMessage.login = login;
-        registerRequestMessage.nick = nick;
-        registerRequestMessage.pass = HashUtil.generateHash(pass);
+        RegisterRequestMessage registerMessage = new RegisterRequestMessage();
+        registerMessage.login = login;
+        registerMessage.nick = nick;
+        registerMessage.pass = HashUtil.generateHash(pass);
 
-        Pref.saveLogin(mPrefs, registerRequestMessage.login);
-        Pref.savePass(mPrefs, registerRequestMessage.pass);
+        Pref.saveLogin(mPrefs, registerMessage.login);
+        Pref.savePass(mPrefs, registerMessage.pass);
 
-        mainActivity.sendMessage(registerRequestMessage);
+        mainActivity.sendMessage(registerMessage);
     }
 
-    public void showSplashFragment() {
+    public void getChannelList(String userId, String sessionId) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        ChannelListRequestMessage channelListMessage = new ChannelListRequestMessage();
+        channelListMessage.cid = userId;
+        channelListMessage.sid = sessionId;
+        mainActivity.sendMessage(channelListMessage);
+    }
+
+//    public void showReconnectFragment(boolean addToBackStack) {
+//        mFirstWelcome = false;
+//        MainActivity mainActivity = mMainActivityWeakRef.get();
+//        if (mainActivity == null) {
+//            return;
+//        }
+//        replaceFragment(mainActivity, ReconnectFragment.newInstance(this),
+//                ReconnectFragment.tag(), addToBackStack);
+//    }
+
+    public void showSplashFragment(boolean addToBackStack) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
         replaceFragment(mainActivity, new SplashFragment(),
-                SplashFragment.tag(), false);
+                SplashFragment.tag(), addToBackStack);
     }
 
-    public void showAuthFragment() {
+    public void showAuthFragment(boolean addToBackStack) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
         replaceFragment(mainActivity, AuthFragment.newInstance(this),
-                AuthFragment.tag(), true);
+                AuthFragment.tag(), addToBackStack);
     }
 
-    public void showRegisterFragment() {
+    public void showRegisterFragment(boolean addToBackStack) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
         replaceFragment(mainActivity, RegisterFragment.newInstance(this),
-                RegisterFragment.tag(), true);
+                RegisterFragment.tag(), addToBackStack);
+    }
+
+    public void showChannelListFragment(List<Channel> channels, boolean addToBackStack) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+        replaceFragment(mainActivity, ChannelListFragment.newInstance(this, channels),
+                ChannelListFragment.tag(), addToBackStack);
     }
 }
