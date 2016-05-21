@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             switch (intent.getAction()) {
                 case NetworkService.ACTION_CONNECTED: {
-                    Logger.d("Connected to socket");
+                    Logger.d("Successful connection");
                     mNetworkServiceConnected = true;
                     break;
                 }
@@ -120,7 +120,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void connectToNetworkService() {
-        Logger.d("Connect to network service");
         disconnect();
         Intent intent = new Intent(MainActivity.this, NetworkService.class);
         bindService(intent, mServiceConnection, BIND_AUTO_CREATE);

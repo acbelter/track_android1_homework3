@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.android1.homework3.R;
 import com.android1.homework3.msg.adapter.ChannelListAdapter;
@@ -18,6 +19,7 @@ public class ChannelListFragment extends ListFragment implements UiFragment {
     private Controller mController;
     private List<Channel> mChannels;
     private ChannelListAdapter mAdapter;
+    private TextView mNoConnectionStub;
 
     public static ChannelListFragment newInstance(Controller controller, List<Channel> channels) {
         ChannelListFragment fragment = new ChannelListFragment();
@@ -35,15 +37,15 @@ public class ChannelListFragment extends ListFragment implements UiFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_channel_list, container, false);
+        View view = inflater.inflate(R.layout.fragment_channel_list, container, false);
+        mNoConnectionStub = (TextView) view.findViewById(R.id.no_connection_stub);
+        return view;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if (mAdapter == null) {
-            mAdapter = new ChannelListAdapter(getActivity(), mChannels);
-        }
+        mAdapter = new ChannelListAdapter(getActivity(), mChannels);
         setListAdapter(mAdapter);
     }
 
@@ -54,7 +56,12 @@ public class ChannelListFragment extends ListFragment implements UiFragment {
 
     @Override
     public void setUiEnabled(boolean enabled) {
-        getListView().setEnabled(enabled);
+        if (!enabled) {
+            getListView().setAdapter(null);
+            mNoConnectionStub.setVisibility(View.VISIBLE);
+        } else {
+            mNoConnectionStub.setVisibility(View.INVISIBLE);
+        }
     }
 
     public static String tag() {

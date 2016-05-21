@@ -26,15 +26,14 @@ import com.android1.homework3.msg.response.WelcomeMessage;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+// Controller shouldn't store its state!
 public final class Controller {
     private WeakReference<MainActivity> mMainActivityWeakRef;
     private SharedPreferences mPrefs;
-//    private boolean mFirstWelcome;
 
     private static String[] sUiFragmentTags = new String[] {
             AuthFragment.tag(),
             ChangeInfoFragment.tag(),
-//            ReconnectFragment.tag(),
             RegisterFragment.tag(),
             UserInfoFragment.tag(),
             ChannelListFragment.tag(),
@@ -44,7 +43,6 @@ public final class Controller {
     public Controller(MainActivity mainActivity) {
         mMainActivityWeakRef = new WeakReference<>(mainActivity);
         mPrefs = PreferenceManager.getDefaultSharedPreferences(mainActivity);
-//        mFirstWelcome = true;
     }
 
     public void processResponse(BaseMessage message) {
@@ -113,7 +111,7 @@ public final class Controller {
         for (String tag : sUiFragmentTags) {
             fragment = fragmentManager.findFragmentByTag(tag);
             if (fragment instanceof UiFragment && fragment.isAdded()) {
-                ((UiFragment) fragment).setUiEnabled(true);
+                ((UiFragment) fragment).setUiEnabled(enabled);
             }
         }
     }
@@ -356,25 +354,6 @@ public final class Controller {
         channelListMessage.cid = userId;
         channelListMessage.sid = sessionId;
         mainActivity.sendMessage(channelListMessage);
-    }
-
-//    public void showReconnectFragment(boolean addToBackStack) {
-//        mFirstWelcome = false;
-//        MainActivity mainActivity = mMainActivityWeakRef.get();
-//        if (mainActivity == null) {
-//            return;
-//        }
-//        replaceFragment(mainActivity, ReconnectFragment.newInstance(this),
-//                ReconnectFragment.tag(), addToBackStack);
-//    }
-
-    public void showSplashFragment(boolean addToBackStack) {
-        MainActivity mainActivity = mMainActivityWeakRef.get();
-        if (mainActivity == null) {
-            return;
-        }
-        replaceFragment(mainActivity, new SplashFragment(),
-                SplashFragment.tag(), addToBackStack);
     }
 
     public void showAuthFragment(boolean addToBackStack) {

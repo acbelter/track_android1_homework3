@@ -18,24 +18,20 @@ public class NetworkService extends Service implements SocketListener {
     private static final String HOST = "188.166.49.215";
     private static final int PORT = 7777;
 
-    private NetworkServiceBinder mNetworkServiceBinder = new NetworkServiceBinder();
+    private NetworkServiceBinder mNetworkServiceBinder;
     private SocketConnectionHandler mSocketConnectionHandler;
     private LocalBroadcastManager mLocalBroadcastManager;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        mNetworkServiceBinder = new NetworkServiceBinder();
         mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
-        try {
-            mSocketConnectionHandler = new SocketConnectionHandler(HOST, PORT);
-            mSocketConnectionHandler.addListener(this);
+        mSocketConnectionHandler = new SocketConnectionHandler(HOST, PORT);
+        mSocketConnectionHandler.addListener(this);
 
-            Thread thread = new Thread(mSocketConnectionHandler);
-            thread.start();
-        } catch (IOException e) {
-            notifyConnectionFailed();
-            e.printStackTrace();
-        }
+        Thread thread = new Thread(mSocketConnectionHandler);
+        thread.start();
     }
 
     private void notifyConnected() {

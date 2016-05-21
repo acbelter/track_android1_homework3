@@ -10,29 +10,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Класс работающий с сокетом, умеет отправлять данные в сокет
- * Также слушает сокет и рассылает событие о сообщении всем подписчикам (асинхронность)
- */
 public class SocketConnectionHandler implements ConnectionHandler {
-    private List<SocketListener> mListeners = new ArrayList<>();
+    private static final long RECONNECT_DELAY = 3000L;
+    private List<SocketListener> mListeners;
     private InputStream mInputStream;
     private OutputStream mOutputStream;
     private String mHost;
     private int mPort;
 
-    public SocketConnectionHandler(String host, int port) throws IOException {
+    public SocketConnectionHandler(String host, int port) {
+        mListeners = new ArrayList<>();
         mHost = host;
         mPort = port;
     }
 
     @Override
     public void send(String data) throws IOException {
-        if (data == null) {
-            return;
+        if (data != null) {
+            mOutputStream.write(data.getBytes("UTF-8"));
+            mOutputStream.flush();
         }
-        mOutputStream.write(data.getBytes("UTF-8"));
-        mOutputStream.flush();
     }
 
     @Override
@@ -43,26 +40,24 @@ public class SocketConnectionHandler implements ConnectionHandler {
     @Override
     public void run() {
         Socket socket = null;
-        try {
-            socket = new Socket(mHost, mPort);
-            mInputStream = socket.getInputStream();
-            mOutputStream = socket.getOutputStream();
-
+        while (!Thread.currentThread().isInterrupted()) {
             try {
-                Thread.sleep(3000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                Logger.d("Attempt to connect to " + mHost + ":" + mPort + " " + hashCode());
+                socket = new Socket(mHost, mPort);
+                mInputStream = socket.getInputStream();
+                mOutputStream = socket.getOutputStream();
 
-            for (SocketListener listener : mListeners) {
-                listener.onConnected();
+                for (SocketListener listener : mListeners) {
+                    listener.onConnected();
+                }
+                break;
+            } catch (IOException e) {
+                try {
+                    Thread.sleep(RECONNECT_DELAY);
+                } catch (InterruptedException ex) {
+                    // Ignore
+                }
             }
-        } catch (IOException e) {
-            for (SocketListener listener : mListeners) {
-                listener.onConnectionFailed();
-            }
-            e.printStackTrace();
-            Thread.currentThread().interrupt();
         }
 
         final byte[] buf = new byte[1024 * 64];
@@ -76,11 +71,10 @@ public class SocketConnectionHandler implements ConnectionHandler {
                     }
                 }
             } catch (Exception e) {
+                Logger.d("Failed to handle connection: " + e.getMessage());
                 for (SocketListener listener : mListeners) {
                     listener.onConnectionFailed();
                 }
-                Logger.d("Failed to handle connection");
-                e.printStackTrace();
                 Thread.currentThread().interrupt();
             }
         }
