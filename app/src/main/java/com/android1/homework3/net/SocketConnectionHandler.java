@@ -15,6 +15,7 @@ public class SocketConnectionHandler implements ConnectionHandler {
     private List<SocketListener> mListeners;
     private InputStream mInputStream;
     private OutputStream mOutputStream;
+    private volatile boolean mIsStopped;
     private String mHost;
     private int mPort;
 
@@ -40,7 +41,7 @@ public class SocketConnectionHandler implements ConnectionHandler {
     @Override
     public void run() {
         Socket socket = null;
-        while (!Thread.currentThread().isInterrupted()) {
+        while (!mIsStopped) {
             try {
                 Logger.d("Attempt to connect to " + mHost + ":" + mPort + " " + hashCode());
                 socket = new Socket(mHost, mPort);
@@ -58,6 +59,10 @@ public class SocketConnectionHandler implements ConnectionHandler {
                     // Ignore
                 }
             }
+        }
+
+        if (mIsStopped) {
+            return;
         }
 
         final byte[] buf = new byte[1024 * 64];
@@ -83,7 +88,7 @@ public class SocketConnectionHandler implements ConnectionHandler {
             try {
                 socket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                // Ignore
             }
         }
     }
@@ -91,5 +96,6 @@ public class SocketConnectionHandler implements ConnectionHandler {
     @Override
     public void stop() {
         Thread.currentThread().interrupt();
+        mIsStopped = true;
     }
 }
