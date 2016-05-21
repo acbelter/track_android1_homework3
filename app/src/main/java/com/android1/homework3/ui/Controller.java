@@ -13,6 +13,7 @@ import com.android1.homework3.Pref;
 import com.android1.homework3.R;
 import com.android1.homework3.msg.BaseMessage;
 import com.android1.homework3.msg.MessageAction;
+import com.android1.homework3.msg.Status;
 import com.android1.homework3.msg.request.AuthRequestMessage;
 import com.android1.homework3.msg.request.RegisterRequestMessage;
 import com.android1.homework3.msg.response.AuthResponseMessage;
@@ -140,10 +141,16 @@ public final class Controller {
             return;
         }
 
+        if (message.status != Status.ERR_OK) {
+            Pref.deleteAuthData(mPrefs);
+        }
+
         switch (message.status) {
             case ERR_OK: {
                 // TODO
                 Logger.d("Successful authorization");
+                Pref.saveUserId(mPrefs, message.uid);
+                Pref.saveSessionId(mPrefs, message.sid);
                 break;
             }
             case ERR_ALREADY_EXIST: {
@@ -194,9 +201,12 @@ public final class Controller {
             return;
         }
 
+        if (message.status != Status.ERR_OK) {
+            Pref.deleteAuthData(mPrefs);
+        }
+
         switch (message.status) {
             case ERR_OK: {
-                // TODO
                 Logger.d("Successful registration");
                 break;
             }
@@ -285,6 +295,10 @@ public final class Controller {
         AuthRequestMessage authRequestMessage = new AuthRequestMessage();
         authRequestMessage.login = login;
         authRequestMessage.pass = HashUtil.generateHash(pass);
+
+        Pref.saveLogin(mPrefs, authRequestMessage.login);
+        Pref.savePass(mPrefs, authRequestMessage.pass);
+
         mainActivity.sendMessage(authRequestMessage);
     }
 
@@ -298,6 +312,10 @@ public final class Controller {
         registerRequestMessage.login = login;
         registerRequestMessage.nick = nick;
         registerRequestMessage.pass = HashUtil.generateHash(pass);
+
+        Pref.saveLogin(mPrefs, registerRequestMessage.login);
+        Pref.savePass(mPrefs, registerRequestMessage.pass);
+
         mainActivity.sendMessage(registerRequestMessage);
     }
 
@@ -316,7 +334,7 @@ public final class Controller {
             return;
         }
         replaceFragment(mainActivity, AuthFragment.newInstance(this),
-                AuthFragment.tag(), false);
+                AuthFragment.tag(), true);
     }
 
     public void showRegisterFragment() {

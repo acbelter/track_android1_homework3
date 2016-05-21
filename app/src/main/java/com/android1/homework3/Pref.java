@@ -43,4 +43,8 @@ public class Pref {
     public static boolean isLoggedIn(SharedPreferences prefs) {
         return prefs.contains(KEY_LOGIN) && prefs.contains(KEY_PASS);
     }
+
+    public static void deleteAuthData(SharedPreferences prefs) {
+        prefs.edit().remove(KEY_LOGIN).remove(KEY_PASS).remove(KEY_USER_ID).remove(KEY_SESSION_ID).apply();
+    }
 }
