@@ -27,4 +27,5 @@
     <string name="toast_channel_not_found">Channel not found</string>
     <string name="toast_user_out_of_channel">Current user out of channel</string>
     <string name="toast_user_not_found">User not found</string>
+    <string name="channel_users">Channel users</string>
 </resources>

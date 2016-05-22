@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -29,6 +30,7 @@ public class ChannelFragment extends ListFragment {
 
     private ChannelMessageAdapter mAdapter;
 
+    private Button mChannelUsersButton;
     private EditText mMessage;
     private ImageView mSendButton;
 
@@ -59,8 +61,17 @@ public class ChannelFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_channel, container, false);
+        mChannelUsersButton = (Button) view.findViewById(R.id.btn_channel_users);
         mMessage = (EditText) view.findViewById(R.id.message);
         mSendButton = (ImageView) view.findViewById(R.id.btn_send);
+
+        mChannelUsersButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mController.showUserListFragment(mChannelUsers, true);
+            }
+        });
+
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

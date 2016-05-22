@@ -22,16 +22,19 @@ import java.util.List;
 public class ChannelListFragment extends ListFragment {
     private Controller mController;
     private String mUserId;
+    private String mSessionId;
     private List<Channel> mChannels;
     private ChannelListAdapter mAdapter;
     private TextView mNoConnectionStub;
 
     public static ChannelListFragment newInstance(Controller controller,
                                                   String userId,
+                                                  String sessionId,
                                                   List<Channel> channels) {
         ChannelListFragment fragment = new ChannelListFragment();
         fragment.mController = controller;
         fragment.mUserId = userId;
+        fragment.mSessionId = sessionId;
         fragment.mChannels = channels;
         return fragment;
     }
@@ -114,7 +117,7 @@ public class ChannelListFragment extends ListFragment {
             case R.id.leave_channel: {
                 Channel channel = mAdapter.getItem(info.position);
                 if (channel.isEntered) {
-                    mController.leaveChannel(channel);
+                    mController.leaveChannel(channel, mUserId, mSessionId);
                 }
                 return true;
             }
@@ -127,7 +130,7 @@ public class ChannelListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         Channel channel = mAdapter.getItem(position);
-        mController.enterChannel(channel);
+        mController.enterChannel(channel, mUserId, mSessionId);
     }
 
     public static String tag() {
