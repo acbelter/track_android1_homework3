@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.android1.homework3.Logger;
 import com.android1.homework3.R;
 import com.android1.homework3.msg.adapter.ChannelListAdapter;
 import com.android1.homework3.msg.response.Channel;
@@ -38,7 +37,6 @@ public class ChannelListFragment extends ListFragment {
     }
 
     public void processEnterChannel(String userId, String channelId) {
-        Logger.d("PROCESS ENTER CHANNEL");
         for (Channel channel : mChannels) {
             if (mUserId != null) {
                 if (channelId.equals(channel.chid)) {
@@ -58,7 +56,6 @@ public class ChannelListFragment extends ListFragment {
     }
 
     public void processLeaveChannel(String userId, String channelId) {
-        Logger.d("PROCESS LEAVE CHANNEL");
         for (Channel channel : mChannels) {
             if (mUserId != null) {
                 if (channelId.equals(channel.chid)) {
@@ -116,7 +113,9 @@ public class ChannelListFragment extends ListFragment {
         switch (item.getItemId()) {
             case R.id.leave_channel: {
                 Channel channel = mAdapter.getItem(info.position);
-                mController.leaveChannel(channel);
+                if (channel.isEntered) {
+                    mController.leaveChannel(channel);
+                }
                 return true;
             }
             default: {

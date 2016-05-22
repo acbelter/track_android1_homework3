@@ -26,6 +26,7 @@ import com.android1.homework3.msg.response.EnterEventMessage;
 import com.android1.homework3.msg.response.EnterResponseMessage;
 import com.android1.homework3.msg.response.LastMessage;
 import com.android1.homework3.msg.response.LeaveEventMessage;
+import com.android1.homework3.msg.response.LeaveResponseMessage;
 import com.android1.homework3.msg.response.RegisterResponseMessage;
 import com.android1.homework3.msg.response.User;
 import com.android1.homework3.msg.response.WelcomeMessage;
@@ -40,6 +41,8 @@ public final class Controller {
 
     // FIXME This field needs because server don't send channel_id in enter response
     private String mLastEnterChannelId;
+    // FIXME This field needs because server don't send channel_id in leave response
+    private String mLastLeaveChannelId;
 
     public Controller(MainActivity mainActivity) {
         mMainActivityWeakRef = new WeakReference<>(mainActivity);
@@ -72,6 +75,7 @@ public final class Controller {
                 break;
             }
             case MessageAction.LEAVE: {
+                processLeaveMessage((LeaveResponseMessage) message);
                 break;
             }
             case MessageAction.EVENT_MESSAGE: {
@@ -134,7 +138,7 @@ public final class Controller {
 
         switch (message.status) {
             case ERR_OK: {
-                Logger.d("Successful authorization: " + message.cid);
+                Logger.d("Successful authorization");
                 Pref.saveUserId(mPrefs, message.cid);
                 Pref.saveSessionId(mPrefs, message.sid);
                 getChannelList(message.cid, message.sid);
@@ -327,6 +331,9 @@ public final class Controller {
                 break;
             }
             case ERR_USER_NOT_FOUND: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_user_not_found, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
                 break;
             }
             case ERR_CHANNEL_NOT_FOUND: {
@@ -341,13 +348,74 @@ public final class Controller {
         }
     }
 
-    public void processEnterEvent(EnterEventMessage message) {
+    private void processLeaveMessage(LeaveResponseMessage message) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
 
-        Logger.d("BLAAA: " + message.uid + " " + message.chid + " " + message.nick);
+        switch (message.status) {
+            case ERR_OK: {
+                Logger.d("Successful leave from channel");
+                FragmentManager fm = mainActivity.getFragmentManager();
+
+                String userId = Pref.loadUserId(mPrefs);
+                ChannelListFragment channelListFragment =
+                        (ChannelListFragment) fm.findFragmentByTag(ChannelListFragment.tag());
+                if (channelListFragment != null) {
+                    channelListFragment.processLeaveChannel(userId, mLastLeaveChannelId);
+                }
+                break;
+            }
+            case ERR_ALREADY_EXIST: {
+                break;
+            }
+            case ERR_INVALID_PASS: {
+                break;
+            }
+            case ERR_INVALID_DATA: {
+                break;
+            }
+            case ERR_EMPTY_FIELD: {
+                break;
+            }
+            case ERR_ALREADY_REGISTER: {
+                break;
+            }
+            case ERR_NEED_AUTH: {
+                showAuthFragment(false);
+                break;
+            }
+            case ERR_NEED_REGISTER: {
+                showRegisterFragment(false);
+                break;
+            }
+            case ERR_USER_NOT_FOUND: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_user_not_found, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_CHANNEL_NOT_FOUND: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_channel_not_found, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_INVALID_CHANNEL: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_user_out_of_channel, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+        }
+    }
+
+    public void processEnterEvent(EnterEventMessage message) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
 
         FragmentManager fm = mainActivity.getFragmentManager();
         ChannelListFragment channelListFragment =
@@ -484,6 +552,8 @@ public final class Controller {
         if (userId == null || sessionId == null || channel == null) {
             return;
         }
+
+        mLastLeaveChannelId = channel.chid;
 
         LeaveRequestMessage leaveMessage = new LeaveRequestMessage();
         leaveMessage.cid = userId;
