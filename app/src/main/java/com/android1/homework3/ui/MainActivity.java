@@ -1,6 +1,7 @@
 package com.android1.homework3.ui;
 
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
@@ -31,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private MessageParser mMessageParser;
     private MessageBuilder mMessageBuilder;
     private Controller mController;
+    private ProgressDialog mLoadingDialog;
 
     private ServiceConnection mServiceConnection = new ServiceConnection() {
         @Override
@@ -87,6 +89,11 @@ public class MainActivity extends AppCompatActivity {
         mMessageBuilder = new JSONMessageBuilder();
         mController = new Controller(this);
 
+        mLoadingDialog = new ProgressDialog(this);
+        mLoadingDialog.setTitle(null);
+        mLoadingDialog.setMessage(getString(R.string.loading_data));
+        mLoadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+
         if (savedInstanceState == null) {
             FragmentTransaction ft = getFragmentManager().beginTransaction();
             ft.replace(R.id.fragment_container, new SplashFragment(), SplashFragment.tag());
@@ -117,6 +124,14 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
         }
+    }
+
+    public void showLoadingDialog() {
+        mLoadingDialog.show();
+    }
+
+    public void hideLoadingDialog() {
+        mLoadingDialog.hide();
     }
 
     public void connectToNetworkService() {

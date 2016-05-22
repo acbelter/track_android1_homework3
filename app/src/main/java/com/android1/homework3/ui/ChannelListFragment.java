@@ -3,9 +3,13 @@ package com.android1.homework3.ui;
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -15,7 +19,7 @@ import com.android1.homework3.msg.response.Channel;
 
 import java.util.List;
 
-public class ChannelListFragment extends ListFragment implements UiFragment {
+public class ChannelListFragment extends ListFragment {
     private Controller mController;
     private List<Channel> mChannels;
     private ChannelListAdapter mAdapter;
@@ -47,17 +51,34 @@ public class ChannelListFragment extends ListFragment implements UiFragment {
         super.onActivityCreated(savedInstanceState);
         mAdapter = new ChannelListAdapter(getActivity(), mChannels);
         setListAdapter(mAdapter);
+        //registerForContextMenu(getListView());
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        MenuInflater inflater = getActivity().getMenuInflater();
+        inflater.inflate(R.menu.channel_context_menu, menu);
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+        AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        switch (item.getItemId()) {
+            case R.id.leave_channel: {
+                Channel channel = mAdapter.getItem(info.position);
+                return true;
+            }
+            default: {
+                return super.onContextItemSelected(item);
+            }
+        }
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         Channel channel = mAdapter.getItem(position);
         mController.showChannelFragment(channel, true);
-    }
-
-    @Override
-    public void setUiEnabled(boolean enabled) {
-
     }
 
     public static String tag() {

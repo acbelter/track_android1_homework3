@@ -1,7 +1,6 @@
 package com.android1.homework3.ui;
 
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -30,15 +29,6 @@ import java.util.List;
 public final class Controller {
     private WeakReference<MainActivity> mMainActivityWeakRef;
     private SharedPreferences mPrefs;
-
-    private static String[] sUiFragmentTags = new String[] {
-            AuthFragment.tag(),
-            ChangeInfoFragment.tag(),
-            RegisterFragment.tag(),
-            UserInfoFragment.tag(),
-            ChannelListFragment.tag(),
-            ChannelFragment.tag()
-    };
 
     public Controller(MainActivity mainActivity) {
         mMainActivityWeakRef = new WeakReference<>(mainActivity);
@@ -100,24 +90,8 @@ public final class Controller {
         ft.commit();
     }
 
-    private void setUiEnabled(boolean enabled) {
-        MainActivity mainActivity = mMainActivityWeakRef.get();
-        if (mainActivity == null) {
-            return;
-        }
-
-        FragmentManager fragmentManager = mainActivity.getFragmentManager();
-        Fragment fragment;
-        for (String tag : sUiFragmentTags) {
-            fragment = fragmentManager.findFragmentByTag(tag);
-            if (fragment instanceof UiFragment && fragment.isAdded()) {
-                ((UiFragment) fragment).setUiEnabled(enabled);
-            }
-        }
-    }
-
     private void processWelcomeMessage(WelcomeMessage message) {
-        setUiEnabled(true);
+        hideLoadingDialog();
 
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
@@ -263,6 +237,7 @@ public final class Controller {
         switch (message.status) {
             case ERR_OK: {
                 Logger.d("Successful getting channel list");
+                hideLoadingDialog();
                 showChannelListFragment(message.channels, false);
                 break;
             }
@@ -311,11 +286,29 @@ public final class Controller {
         mainActivity.connectToNetworkService();
     }
 
+    public void showLoadingDialog() {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+        mainActivity.showLoadingDialog();
+    }
+
+    public void hideLoadingDialog() {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+        mainActivity.hideLoadingDialog();
+    }
+
     public void authorize(String login, String pass) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
+
+        showLoadingDialog();
 
         AuthRequestMessage authMessage = new AuthRequestMessage();
         authMessage.login = login;
@@ -332,6 +325,8 @@ public final class Controller {
         if (mainActivity == null) {
             return;
         }
+
+        showLoadingDialog();
 
         RegisterRequestMessage registerMessage = new RegisterRequestMessage();
         registerMessage.login = login;

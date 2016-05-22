@@ -13,7 +13,7 @@ import android.widget.ListView;
 import com.android1.homework3.R;
 import com.android1.homework3.msg.response.Channel;
 
-public class ChannelFragment extends ListFragment implements UiFragment {
+public class ChannelFragment extends ListFragment {
     private Channel mChannel;
     private Controller mController;
     private EditText mMessage;
@@ -50,12 +50,6 @@ public class ChannelFragment extends ListFragment implements UiFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
-    }
-
-    @Override
-    public void setUiEnabled(boolean enabled) {
-        mMessage.setEnabled(enabled);
-        mSendButton.setEnabled(enabled);
     }
 
     public static String tag() {

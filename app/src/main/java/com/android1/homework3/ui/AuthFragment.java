@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.android1.homework3.R;
 import com.android1.homework3.msg.NoSpaceFilter;
 
-public class AuthFragment extends Fragment implements UiFragment {
+public class AuthFragment extends Fragment {
     private Controller mController;
     private EditText mLogin;
     private EditText mPassword;
@@ -61,7 +61,6 @@ public class AuthFragment extends Fragment implements UiFragment {
                     return;
                 }
 
-                setUiEnabled(false);
                 mController.authorize(login, pass);
             }
         });
@@ -74,14 +73,6 @@ public class AuthFragment extends Fragment implements UiFragment {
         });
 
         return view;
-    }
-
-    @Override
-    public void setUiEnabled(boolean enabled) {
-        mLogin.setEnabled(enabled);
-        mPassword.setEnabled(enabled);
-        mLoginButton.setEnabled(enabled);
-        mRegisterButton.setEnabled(enabled);
     }
 
     public static String tag() {
