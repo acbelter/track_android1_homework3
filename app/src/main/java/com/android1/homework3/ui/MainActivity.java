@@ -131,7 +131,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void hideLoadingDialog() {
-        mLoadingDialog.hide();
+        mLoadingDialog.dismiss();
     }
 
     public void connectToNetworkService() {

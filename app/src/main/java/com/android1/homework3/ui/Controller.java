@@ -1,6 +1,7 @@
 package com.android1.homework3.ui;
 
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
@@ -15,11 +16,18 @@ import com.android1.homework3.msg.MessageAction;
 import com.android1.homework3.msg.Status;
 import com.android1.homework3.msg.request.AuthRequestMessage;
 import com.android1.homework3.msg.request.ChannelListRequestMessage;
+import com.android1.homework3.msg.request.EnterRequestMessage;
+import com.android1.homework3.msg.request.LeaveRequestMessage;
 import com.android1.homework3.msg.request.RegisterRequestMessage;
 import com.android1.homework3.msg.response.AuthResponseMessage;
 import com.android1.homework3.msg.response.Channel;
 import com.android1.homework3.msg.response.ChannelListResponseMessage;
+import com.android1.homework3.msg.response.EnterEventMessage;
+import com.android1.homework3.msg.response.EnterResponseMessage;
+import com.android1.homework3.msg.response.LastMessage;
+import com.android1.homework3.msg.response.LeaveEventMessage;
 import com.android1.homework3.msg.response.RegisterResponseMessage;
+import com.android1.homework3.msg.response.User;
 import com.android1.homework3.msg.response.WelcomeMessage;
 
 import java.lang.ref.WeakReference;
@@ -29,6 +37,9 @@ import java.util.List;
 public final class Controller {
     private WeakReference<MainActivity> mMainActivityWeakRef;
     private SharedPreferences mPrefs;
+
+    // FIXME This field needs because server don't send channel_id in enter response
+    private String mLastEnterChannelId;
 
     public Controller(MainActivity mainActivity) {
         mMainActivityWeakRef = new WeakReference<>(mainActivity);
@@ -49,12 +60,15 @@ public final class Controller {
                 break;
             }
             case MessageAction.EVENT_ENTER: {
+                processEnterEvent((EnterEventMessage) message);
                 break;
             }
             case MessageAction.ENTER: {
+                processEnterMessage((EnterResponseMessage) message);
                 break;
             }
             case MessageAction.EVENT_LEAVE: {
+                processLeaveEvent((LeaveEventMessage) message);
                 break;
             }
             case MessageAction.LEAVE: {
@@ -120,10 +134,10 @@ public final class Controller {
 
         switch (message.status) {
             case ERR_OK: {
-                Logger.d("Successful authorization");
-                Pref.saveUserId(mPrefs, message.uid);
+                Logger.d("Successful authorization: " + message.cid);
+                Pref.saveUserId(mPrefs, message.cid);
                 Pref.saveSessionId(mPrefs, message.sid);
-                getChannelList(message.uid, message.sid);
+                getChannelList(message.cid, message.sid);
                 break;
             }
             case ERR_ALREADY_EXIST: {
@@ -276,6 +290,87 @@ public final class Controller {
         }
     }
 
+    private void processEnterMessage(EnterResponseMessage message) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        switch (message.status) {
+            case ERR_OK: {
+                Logger.d("Successful enter to channel");
+                hideLoadingDialog();
+                showChannelFragment(message.users, message.lastMsg, true);
+                break;
+            }
+            case ERR_ALREADY_EXIST: {
+                break;
+            }
+            case ERR_INVALID_PASS: {
+                break;
+            }
+            case ERR_INVALID_DATA: {
+                break;
+            }
+            case ERR_EMPTY_FIELD: {
+                break;
+            }
+            case ERR_ALREADY_REGISTER: {
+                break;
+            }
+            case ERR_NEED_AUTH: {
+                showAuthFragment(false);
+                break;
+            }
+            case ERR_NEED_REGISTER: {
+                showRegisterFragment(false);
+                break;
+            }
+            case ERR_USER_NOT_FOUND: {
+                break;
+            }
+            case ERR_CHANNEL_NOT_FOUND: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_channel_not_found, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_INVALID_CHANNEL: {
+                break;
+            }
+        }
+    }
+
+    public void processEnterEvent(EnterEventMessage message) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        Logger.d("BLAAA: " + message.uid + " " + message.chid + " " + message.nick);
+
+        FragmentManager fm = mainActivity.getFragmentManager();
+        ChannelListFragment channelListFragment =
+                (ChannelListFragment) fm.findFragmentByTag(ChannelListFragment.tag());
+        if (channelListFragment != null) {
+            channelListFragment.processEnterChannel(message.uid, message.chid);
+        }
+    }
+
+    public void processLeaveEvent(LeaveEventMessage message) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        FragmentManager fm = mainActivity.getFragmentManager();
+        ChannelListFragment channelListFragment =
+                (ChannelListFragment) fm.findFragmentByTag(ChannelListFragment.tag());
+        if (channelListFragment != null) {
+            channelListFragment.processLeaveChannel(message.uid, message.chid);
+        }
+    }
+
     public void processConnectionFailed() {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
@@ -351,6 +446,72 @@ public final class Controller {
         mainActivity.sendMessage(channelListMessage);
     }
 
+    public void enterChannel(Channel channel) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        String userId = Pref.loadUserId(mPrefs);
+        String sessionId = Pref.loadSessionId(mPrefs);
+
+        if (userId == null || sessionId == null || channel == null) {
+            Toast.makeText(mainActivity.getApplicationContext(),
+                    R.string.toast_unable_channel_enter, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        showLoadingDialog();
+
+        mLastEnterChannelId = channel.chid;
+
+        EnterRequestMessage enterMessage = new EnterRequestMessage();
+        enterMessage.cid = userId;
+        enterMessage.sid = sessionId;
+        enterMessage.channel = channel.chid;
+        mainActivity.sendMessage(enterMessage);
+    }
+
+    public void leaveChannel(Channel channel) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        String userId = Pref.loadUserId(mPrefs);
+        String sessionId = Pref.loadSessionId(mPrefs);
+
+        if (userId == null || sessionId == null || channel == null) {
+            return;
+        }
+
+        LeaveRequestMessage leaveMessage = new LeaveRequestMessage();
+        leaveMessage.cid = userId;
+        leaveMessage.sid = sessionId;
+        leaveMessage.channel = channel.chid;
+        mainActivity.sendMessage(leaveMessage);
+    }
+
+    public void leaveAllChannels() {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        String userId = Pref.loadUserId(mPrefs);
+        String sessionId = Pref.loadSessionId(mPrefs);
+
+        if (userId == null || sessionId == null) {
+            return;
+        }
+
+        LeaveRequestMessage leaveMessage = new LeaveRequestMessage();
+        leaveMessage.cid = userId;
+        leaveMessage.sid = sessionId;
+        leaveMessage.channel = "*";
+        mainActivity.sendMessage(leaveMessage);
+    }
+
     public void showSplashFragment(boolean addToBackStack) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
@@ -383,16 +544,23 @@ public final class Controller {
         if (mainActivity == null) {
             return;
         }
-        replaceFragment(mainActivity, ChannelListFragment.newInstance(this, channels),
+
+        String userId = Pref.loadUserId(mPrefs);
+        replaceFragment(mainActivity, ChannelListFragment.newInstance(this, userId, channels),
                 ChannelListFragment.tag(), addToBackStack);
     }
 
-    public void showChannelFragment(Channel channel, boolean addToBackStack) {
+    public void showChannelFragment(List<User> users,
+                                    List<LastMessage> lastMessages,
+                                    boolean addToBackStack) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
         }
-        replaceFragment(mainActivity, ChannelFragment.newInstance(this, channel),
+
+        String userId = Pref.loadUserId(mPrefs);
+        replaceFragment(mainActivity, ChannelFragment.newInstance(this,
+                userId, mLastEnterChannelId, users, lastMessages),
                 ChannelFragment.tag(), addToBackStack);
     }
 }

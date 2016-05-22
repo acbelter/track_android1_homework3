@@ -23,4 +23,6 @@
     <string name="no_connection">No connection</string>
     <string name="leave_channel">Leave channel</string>
     <string name="loading_data" tools:ignore="TypographyEllipsis">Loading data...</string>
+    <string name="toast_unable_channel_enter">Unable to enter to the the channel</string>
+    <string name="toast_channel_not_found">Channel not found</string>
 </resources>

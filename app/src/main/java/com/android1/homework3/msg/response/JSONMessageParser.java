@@ -73,7 +73,7 @@ public class JSONMessageParser implements MessageParser {
         message.status = Status.values()[data.getInt("status")];
         message.error = data.optString("error");
         message.sid = data.optString("sid");
-        message.uid = data.optString("uid");
+        message.cid = data.optString("cid");
         return message;
     }
 
@@ -119,8 +119,8 @@ public class JSONMessageParser implements MessageParser {
         JSONObject data = json.getJSONObject("data");
 
         message.chid = data.getString("chid");
-        message.chid = data.getString("uid");
-        message.chid = data.getString("nick");
+        message.uid = data.getString("uid");
+        message.nick = data.getString("nick");
         return message;
     }
 

@@ -12,14 +12,14 @@ import com.android1.homework3.msg.Status;
         "status":[0-9]+,
         "error":"TEXT_OF_ERROR",
         "sid":"SESSION_ID",
-        "uid":"USER_ID"
+        "cid":"USER_ID"
     }
 }*/
 public class AuthResponseMessage implements BaseMessage {
     public Status status;
     public String error;
     public String sid;  // session id
-    public String uid;  // user id
+    public String cid;  // user id
 
     public AuthResponseMessage() {
     }
@@ -28,7 +28,7 @@ public class AuthResponseMessage implements BaseMessage {
         status = Status.values()[in.readInt()];
         error = in.readString();
         sid = in.readString();
-        uid = in.readString();
+        cid = in.readString();
     }
 
     public static final Creator<AuthResponseMessage> CREATOR = new Creator<AuthResponseMessage>() {
@@ -53,7 +53,7 @@ public class AuthResponseMessage implements BaseMessage {
         out.writeInt(status.ordinal());
         out.writeString(error);
         out.writeString(sid);
-        out.writeString(uid);
+        out.writeString(cid);
     }
 
     @Override

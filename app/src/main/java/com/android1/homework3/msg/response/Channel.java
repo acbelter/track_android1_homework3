@@ -15,6 +15,8 @@ public class Channel implements Parcelable {
     public String descr;
     public int online; // online users count
 
+    public boolean isEntered;
+
     public Channel() {
     }
 
@@ -23,6 +25,7 @@ public class Channel implements Parcelable {
         name = in.readString();
         descr = in.readString();
         online = in.readInt();
+        isEntered = in.readInt() == 1;
     }
 
     public static final Creator<Channel> CREATOR = new Creator<Channel>() {
@@ -48,5 +51,6 @@ public class Channel implements Parcelable {
         out.writeString(name);
         out.writeString(descr);
         out.writeInt(online);
+        out.writeInt(isEntered ? 1 : 0);
     }
 }

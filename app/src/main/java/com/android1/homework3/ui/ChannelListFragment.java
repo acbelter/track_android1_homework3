@@ -13,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.android1.homework3.Logger;
 import com.android1.homework3.R;
 import com.android1.homework3.msg.adapter.ChannelListAdapter;
 import com.android1.homework3.msg.response.Channel;
@@ -21,15 +22,63 @@ import java.util.List;
 
 public class ChannelListFragment extends ListFragment {
     private Controller mController;
+    private String mUserId;
     private List<Channel> mChannels;
     private ChannelListAdapter mAdapter;
     private TextView mNoConnectionStub;
 
-    public static ChannelListFragment newInstance(Controller controller, List<Channel> channels) {
+    public static ChannelListFragment newInstance(Controller controller,
+                                                  String userId,
+                                                  List<Channel> channels) {
         ChannelListFragment fragment = new ChannelListFragment();
         fragment.mController = controller;
+        fragment.mUserId = userId;
         fragment.mChannels = channels;
         return fragment;
+    }
+
+    public void processEnterChannel(String userId, String channelId) {
+        Logger.d("PROCESS ENTER CHANNEL");
+        for (Channel channel : mChannels) {
+            if (mUserId != null) {
+                if (channelId.equals(channel.chid)) {
+                    channel.online++;
+                    if (mUserId.equals(userId)) {
+                        channel.isEntered = true;
+                    }
+                }
+            } else {
+                if (channelId.equals(channel.chid)) {
+                    channel.online++;
+                    channel.isEntered = true;
+                }
+            }
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void processLeaveChannel(String userId, String channelId) {
+        Logger.d("PROCESS LEAVE CHANNEL");
+        for (Channel channel : mChannels) {
+            if (mUserId != null) {
+                if (channelId.equals(channel.chid)) {
+                    if (channel.online > 0) {
+                        channel.online--;
+                    }
+                    if (mUserId.equals(userId)) {
+                        channel.isEntered = false;
+                    }
+                }
+            } else {
+                if (channelId.equals(channel.chid)) {
+                    if (channel.online > 0) {
+                        channel.online--;
+                    }
+                    channel.isEntered = false;
+                }
+            }
+        }
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -51,7 +100,7 @@ public class ChannelListFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         mAdapter = new ChannelListAdapter(getActivity(), mChannels);
         setListAdapter(mAdapter);
-        //registerForContextMenu(getListView());
+        registerForContextMenu(getListView());
     }
 
     @Override
@@ -67,6 +116,7 @@ public class ChannelListFragment extends ListFragment {
         switch (item.getItemId()) {
             case R.id.leave_channel: {
                 Channel channel = mAdapter.getItem(info.position);
+                mController.leaveChannel(channel);
                 return true;
             }
             default: {
@@ -78,7 +128,7 @@ public class ChannelListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         Channel channel = mAdapter.getItem(position);
-        mController.showChannelFragment(channel, true);
+        mController.enterChannel(channel);
     }
 
     public static String tag() {
