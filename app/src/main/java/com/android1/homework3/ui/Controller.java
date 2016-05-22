@@ -307,7 +307,7 @@ public final class Controller {
             return;
         }
 
-        setUiEnabled(false);
+        showSplashFragment(false);
         mainActivity.connectToNetworkService();
     }
 
@@ -356,6 +356,15 @@ public final class Controller {
         mainActivity.sendMessage(channelListMessage);
     }
 
+    public void showSplashFragment(boolean addToBackStack) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+        replaceFragment(mainActivity, new SplashFragment(),
+                SplashFragment.tag(), addToBackStack);
+    }
+
     public void showAuthFragment(boolean addToBackStack) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
@@ -381,5 +390,14 @@ public final class Controller {
         }
         replaceFragment(mainActivity, ChannelListFragment.newInstance(this, channels),
                 ChannelListFragment.tag(), addToBackStack);
+    }
+
+    public void showChannelFragment(Channel channel, boolean addToBackStack) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+        replaceFragment(mainActivity, ChannelFragment.newInstance(this, channel),
+                ChannelFragment.tag(), addToBackStack);
     }
 }

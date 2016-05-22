@@ -6,14 +6,22 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.android1.homework3.R;
+import com.android1.homework3.msg.response.Channel;
 
 public class ChannelFragment extends ListFragment implements UiFragment {
+    private Channel mChannel;
     private Controller mController;
+    private EditText mMessage;
+    private ImageView mSendButton;
 
-    public static ChannelFragment newInstance(Controller controller) {
+    public static ChannelFragment newInstance(Controller controller, Channel channel) {
         ChannelFragment fragment = new ChannelFragment();
+        fragment.mChannel = channel;
         fragment.mController = controller;
         return fragment;
     }
@@ -27,12 +35,27 @@ public class ChannelFragment extends ListFragment implements UiFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_channel, container, false);
+        View view = inflater.inflate(R.layout.fragment_channel, container, false);
+        mMessage = (EditText) view.findViewById(R.id.message);
+        mSendButton = (ImageView) view.findViewById(R.id.btn_send);
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+        return view;
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+
     }
 
     @Override
     public void setUiEnabled(boolean enabled) {
-        getListView().setEnabled(enabled);
+        mMessage.setEnabled(enabled);
+        mSendButton.setEnabled(enabled);
     }
 
     public static String tag() {

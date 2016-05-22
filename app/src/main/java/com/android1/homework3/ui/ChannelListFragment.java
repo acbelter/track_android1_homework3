@@ -52,16 +52,12 @@ public class ChannelListFragment extends ListFragment implements UiFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         Channel channel = mAdapter.getItem(position);
+        mController.showChannelFragment(channel, true);
     }
 
     @Override
     public void setUiEnabled(boolean enabled) {
-        if (!enabled) {
-            getListView().setAdapter(null);
-            mNoConnectionStub.setVisibility(View.VISIBLE);
-        } else {
-            mNoConnectionStub.setVisibility(View.INVISIBLE);
-        }
+
     }
 
     public static String tag() {
