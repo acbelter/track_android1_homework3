@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SocketConnectionHandler implements ConnectionHandler {
@@ -65,16 +64,11 @@ public class SocketConnectionHandler implements ConnectionHandler {
             return;
         }
 
+        StreamProcessor streamProcessor = new JSONStreamProcessor();
         final byte[] buf = new byte[1024 * 64];
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                int read = mInputStream.read(buf);
-                if (read > 0) {
-                    String data = new String(Arrays.copyOf(buf, read), "UTF-8");
-                    for (SocketListener listener : mListeners) {
-                        listener.onDataReceived(data);
-                    }
-                }
+                streamProcessor.read(mInputStream, buf, mListeners);
             } catch (Exception e) {
                 Logger.d("Failed to handle connection: " + e.getMessage());
                 for (SocketListener listener : mListeners) {
