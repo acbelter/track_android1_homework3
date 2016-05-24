@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 case NetworkService.ACTION_DATA_RECEIVED: {
                     String data = intent.getStringExtra("data");
-                    Logger.d("Message received: " + data);
+                    Logger.d("Received data: " + data);
                     BaseMessage message = mMessageParser.parseMessage(data);
                     if (message != null) {
                         mController.processResponse(message);

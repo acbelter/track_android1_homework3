@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListView;
 
 import com.android1.homework3.R;
 import com.android1.homework3.msg.adapter.ChannelMessageAdapter;
@@ -23,6 +22,7 @@ import java.util.List;
 public class ChannelFragment extends ListFragment {
     private Controller mController;
     private String mUserId;
+    private String mSessionId;
     private String mChannelId;
 
     private List<User> mChannelUsers;
@@ -36,11 +36,13 @@ public class ChannelFragment extends ListFragment {
 
     public static ChannelFragment newInstance(Controller controller,
                                               String userId,
+                                              String sessionId,
                                               String channelId,
                                               List<User> users,
                                               List<LastMessage> lastMessages) {
         ChannelFragment fragment = new ChannelFragment();
         fragment.mUserId = userId;
+        fragment.mSessionId = sessionId;
         fragment.mChannelId = channelId;
         fragment.mChannelUsers = users;
         fragment.mChannelMessages = new ArrayList<>();
@@ -75,7 +77,10 @@ public class ChannelFragment extends ListFragment {
         mSendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String messageBody = mMessage.getText().toString();
+                if (!messageBody.isEmpty()) {
+                    mController.send(messageBody, mChannelId, mUserId, mSessionId);
+                }
             }
         });
         return view;
@@ -87,9 +92,11 @@ public class ChannelFragment extends ListFragment {
         mAdapter = new ChannelMessageAdapter(getActivity(), mUserId, mChannelMessages);
     }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-
+    public void processMessage(String channelId, ChannelMessage message) {
+        if (mChannelId != null && mChannelId.equals(channelId)) {
+            mChannelMessages.add(message);
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     public static String tag() {

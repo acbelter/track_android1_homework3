@@ -20,17 +20,20 @@ import com.android1.homework3.msg.request.CreateChannelRequestMessage;
 import com.android1.homework3.msg.request.EnterRequestMessage;
 import com.android1.homework3.msg.request.LeaveRequestMessage;
 import com.android1.homework3.msg.request.RegisterRequestMessage;
+import com.android1.homework3.msg.request.SendRequestMessage;
 import com.android1.homework3.msg.request.SetUserInfoRequestMessage;
 import com.android1.homework3.msg.request.UserInfoRequestMessage;
 import com.android1.homework3.msg.response.AuthResponseMessage;
 import com.android1.homework3.msg.response.Channel;
 import com.android1.homework3.msg.response.ChannelListResponseMessage;
+import com.android1.homework3.msg.response.ChannelMessage;
 import com.android1.homework3.msg.response.CreateChannelResponseMessage;
 import com.android1.homework3.msg.response.EnterEventMessage;
 import com.android1.homework3.msg.response.EnterResponseMessage;
 import com.android1.homework3.msg.response.LastMessage;
 import com.android1.homework3.msg.response.LeaveEventMessage;
 import com.android1.homework3.msg.response.LeaveResponseMessage;
+import com.android1.homework3.msg.response.MessageEventMessage;
 import com.android1.homework3.msg.response.RegisterResponseMessage;
 import com.android1.homework3.msg.response.SetUserInfoResponseMessage;
 import com.android1.homework3.msg.response.User;
@@ -86,7 +89,7 @@ public final class Controller {
                 break;
             }
             case MessageAction.EVENT_MESSAGE: {
-                // TODO
+                processMessageEvent((MessageEventMessage) message);
                 break;
             }
             case MessageAction.REGISTER: {
@@ -621,6 +624,20 @@ public final class Controller {
         }
     }
 
+    public void processMessageEvent(MessageEventMessage message) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        FragmentManager fm = mainActivity.getFragmentManager();
+        ChannelFragment channelFragment =
+                (ChannelFragment) fm.findFragmentByTag(ChannelFragment.tag());
+        if (channelFragment != null) {
+            channelFragment.processMessage(message.chid, new ChannelMessage(message));
+        }
+    }
+
     public void processConnectionFailed() {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
@@ -793,6 +810,20 @@ public final class Controller {
         mainActivity.sendMessage(createChannelMessage);
     }
 
+    public void send(String body, String channel, String userId, String sessionId) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        SendRequestMessage sendMessage = new SendRequestMessage();
+        sendMessage.body = body;
+        sendMessage.channel = channel;
+        sendMessage.cid = userId;
+        sendMessage.sid = sessionId;
+        mainActivity.sendMessage(sendMessage);
+    }
+
     public void showSplashFragment(boolean addToBackStack) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
@@ -841,8 +872,9 @@ public final class Controller {
         }
 
         String userId = Pref.loadUserId(mPrefs);
+        String sessionId = Pref.loadSessionId(mPrefs);
         replaceFragment(mainActivity, ChannelFragment.newInstance(this,
-                userId, mLastEnterChannelId, users, lastMessages),
+                userId, sessionId, mLastEnterChannelId, users, lastMessages),
                 ChannelFragment.tag(), addToBackStack);
     }
 

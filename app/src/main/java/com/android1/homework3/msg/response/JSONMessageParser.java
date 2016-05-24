@@ -1,5 +1,6 @@
 package com.android1.homework3.msg.response;
 
+import com.android1.homework3.Logger;
 import com.android1.homework3.msg.BaseMessage;
 import com.android1.homework3.msg.MessageAction;
 import com.android1.homework3.msg.Status;
@@ -61,7 +62,7 @@ public class JSONMessageParser implements MessageParser {
                 }
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            Logger.d("JSONException: " + e.getMessage());
         }
         return null;
     }
