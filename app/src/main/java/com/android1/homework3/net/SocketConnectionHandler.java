@@ -66,25 +66,33 @@ public class SocketConnectionHandler implements ConnectionHandler {
         }
 
         DataProcessor dataProcessor = new JSONDataProcessor();
-        final byte[] buf = new byte[1024 * 64];
+        final byte[] buf = new byte[1024 * 8];
+        StringBuilder builder = new StringBuilder();
         while (!Thread.currentThread().isInterrupted()) {
             try {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                int readBytesCount = mInputStream.read(buf);
-                Logger.d("Read bytes from socket: " + readBytesCount);
+                int read = mInputStream.read(buf);
+                Logger.d("Read bytes from socket: " + read);
 
-                if (readBytesCount > 0) {
-                    baos.write(buf, 0, readBytesCount);
+                if (read != -1) {
+                    baos.write(buf, 0, read);
                 }
 
                 baos.flush();
                 baos.close();
 
-                String data = new String(baos.toByteArray(), "UTF-8");
-                for (SocketListener listener : mListeners) {
-                    listener.onDataReceived(data);
+                builder.append(new String(baos.toByteArray(), "UTF-8"));
+
+                List<String> dataParts = dataProcessor.process(builder.toString());
+
+                if (dataParts != null) {
+                    builder.setLength(0);
+                    for (SocketListener listener : mListeners) {
+                        for (String dataPart : dataParts) {
+                            listener.onDataReceived(dataPart);
+                        }
+                    }
                 }
-                //dataProcessor.process(data, mListeners);
             } catch (Exception e) {
                 Logger.d("Failed to handle connection: " + e.getMessage());
                 for (SocketListener listener : mListeners) {

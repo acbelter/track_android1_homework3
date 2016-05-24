@@ -766,7 +766,7 @@ public final class Controller {
         mainActivity.sendMessage(leaveMessage);
     }
 
-    public void getUserInfo(User user, String userId, String sessionId) {
+    public void getUserInfo(String requestedUserId, String userId, String sessionId) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
             return;
@@ -775,7 +775,7 @@ public final class Controller {
         showLoadingDialog();
 
         UserInfoRequestMessage userInfoMessage = new UserInfoRequestMessage();
-        userInfoMessage.user = user.uid;
+        userInfoMessage.user = requestedUserId;
         userInfoMessage.cid = userId;
         userInfoMessage.sid = sessionId;
         mainActivity.sendMessage(userInfoMessage);

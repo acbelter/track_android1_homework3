@@ -9,47 +9,29 @@ public class JSONDataProcessor implements DataProcessor {
     private static final char CLOSE_BRACE = '}';
 
     @Override
-    public void process(String data, List<SocketListener> listeners) throws Exception {
-        List<String> dataParts = new ArrayList<>();
-
-        if (data == null) {
-            return;
+    public List<String> process(String data)  {
+        if (data == null || !data.trim().endsWith(String.valueOf(CLOSE_BRACE))) {
+            return null;
         }
-        Stack<Character> stack = new Stack<>();
-        int firstOpenBrace = -1;
+
+        int openBracesCount = 0;
+        int closeBracesCount = 0;
+
         for (int i = 0; i < data.length(); i++) {
             if (data.charAt(i) == OPEN_BRACE) {
-                if (firstOpenBrace == -1) {
-                    firstOpenBrace = i;
-                }
-                stack.push(OPEN_BRACE);
+                openBracesCount++;
             } else if (data.charAt(i) == CLOSE_BRACE) {
-                if (!stack.isEmpty()) {
-                    stack.pop();
-                    if (stack.isEmpty()) {
-                        dataParts.add(data.substring(firstOpenBrace, i + 1));
-                        firstOpenBrace = -1;
-                    }
-                }
+                closeBracesCount++;
             }
         }
 
-        if (listeners != null) {
-            for (SocketListener listener : listeners) {
-                for (String dataPart : dataParts) {
-                    listener.onDataReceived(dataPart);
-                }
-            }
+        if (openBracesCount == 0 ||
+                closeBracesCount == 0 ||
+                openBracesCount != closeBracesCount) {
+            return null;
         }
-    }
 
-    @Override
-    public List<String> process(String data) throws Exception {
         List<String> dataParts = new ArrayList<>();
-        if (data == null) {
-            return dataParts;
-        }
-
         Stack<Character> stack = new Stack<>();
         int firstOpenBrace = -1;
         for (int i = 0; i < data.length(); i++) {

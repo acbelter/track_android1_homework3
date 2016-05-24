@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * To work on unit tests, switch the Test Artifact in the Build Variants view.
@@ -47,7 +48,7 @@ public class ExampleUnitTest {
 
         String data = "{\"id\":\"1\"";
         List<String> parts = reader.process(data);
-        assertEquals(parts.size(), 0);
+        assertNull(parts);
 
 //        for (String part : parts) {
 //            System.out.println(part);

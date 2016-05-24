@@ -29,15 +29,15 @@ public class ChannelMessage implements Parcelable {
         body = in.readString();
     }
 
-    public static final Creator<LastMessage> CREATOR = new Creator<LastMessage>() {
+    public static final Creator<ChannelMessage> CREATOR = new Creator<ChannelMessage>() {
         @Override
-        public LastMessage createFromParcel(Parcel in) {
-            return new LastMessage(in);
+        public ChannelMessage createFromParcel(Parcel in) {
+            return new ChannelMessage(in);
         }
 
         @Override
-        public LastMessage[] newArray(int size) {
-            return new LastMessage[size];
+        public ChannelMessage[] newArray(int size) {
+            return new ChannelMessage[size];
         }
     };
 

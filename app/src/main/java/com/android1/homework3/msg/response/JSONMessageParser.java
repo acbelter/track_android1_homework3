@@ -10,6 +10,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Collections;
+import java.util.Comparator;
+
 public class JSONMessageParser implements MessageParser {
     @Override
     public BaseMessage parseMessage(String data)  {
@@ -97,6 +100,13 @@ public class JSONMessageParser implements MessageParser {
                 message.channels.add(channel);
             }
         }
+
+        Collections.sort(message.channels, new Comparator<Channel>() {
+            @Override
+            public int compare(Channel lhs, Channel rhs) {
+                return lhs.name.compareTo(rhs.name);
+            }
+        });
 
         return message;
     }

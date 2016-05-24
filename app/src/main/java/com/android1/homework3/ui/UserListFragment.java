@@ -55,7 +55,7 @@ public class UserListFragment extends ListFragment {
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         User user = mAdapter.getItem(position);
-        mController.getUserInfo(user, mUserId, mSessionId);
+        mController.getUserInfo(user.uid, mUserId, mSessionId);
     }
 
     public static String tag() {

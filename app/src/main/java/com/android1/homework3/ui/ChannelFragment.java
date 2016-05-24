@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 
 import com.android1.homework3.R;
 import com.android1.homework3.msg.adapter.ChannelMessageAdapter;
@@ -92,6 +93,16 @@ public class ChannelFragment extends ListFragment {
         super.onActivityCreated(savedInstanceState);
         mAdapter = new ChannelMessageAdapter(getActivity(), mUserId, mChannelMessages);
         setListAdapter(mAdapter);
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        ChannelMessage message = mAdapter.getItem(position);
+        if (mUserId.equals(message.from)) {
+            mController.showChangeUserInfoFragment(true);
+        } else {
+            mController.getUserInfo(message.from, mUserId, mSessionId);
+        }
     }
 
     public void processMessage(String channelId, ChannelMessage message) {

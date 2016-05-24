@@ -21,6 +21,14 @@
             android:src="@drawable/image"/>
 
         <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/big_margin"
+            android:layout_marginRight="@dimen/big_margin"
+            android:textStyle="bold"
+            tools:text="@string/nickname"/>
+
+        <TextView
             android:id="@+id/nickname"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -29,12 +37,20 @@
             tools:text="Nickname"/>
 
         <TextView
-            android:id="@+id/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/big_margin"
             android:layout_marginRight="@dimen/big_margin"
             android:layout_marginTop="16dp"
+            android:textStyle="bold"
+            tools:text="@string/status"/>
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/big_margin"
+            android:layout_marginRight="@dimen/big_margin"
             tools:text="Status"/>
     </LinearLayout>
 </ScrollView>

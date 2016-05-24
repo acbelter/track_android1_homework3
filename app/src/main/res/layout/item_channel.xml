@@ -29,7 +29,8 @@
         android:layout_toRightOf="@id/image"
         android:paddingRight="4dp"
         android:text="@string/online_users"
-        android:textStyle="italic"/>
+        android:textStyle="italic"
+        android:visibility="gone"/>
 
     <TextView
         android:id="@+id/online_users"
@@ -38,6 +39,7 @@
         android:layout_below="@id/name"
         android:layout_toRightOf="@id/online_users_title"
         android:textStyle="italic"
+        android:visibility="gone"
         tools:text="21"/>
 
     <TextView
