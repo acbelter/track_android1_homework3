@@ -42,7 +42,7 @@ public class SocketConnectionHandler implements ConnectionHandler {
         Socket socket = null;
         while (!mIsStopped) {
             try {
-                Logger.d("Attempt to connect to " + mHost + ":" + mPort + " " + hashCode());
+                Logger.d("Attempt to connect to " + mHost + ":" + mPort + ", handlerHash: " + hashCode());
                 socket = new Socket(mHost, mPort);
                 mInputStream = socket.getInputStream();
                 mOutputStream = socket.getOutputStream();

@@ -10,8 +10,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.android1.homework3.R;
 import com.android1.homework3.msg.adapter.ChannelListAdapter;
@@ -25,7 +25,8 @@ public class ChannelListFragment extends ListFragment {
     private String mSessionId;
     private List<Channel> mChannels;
     private ChannelListAdapter mAdapter;
-    private TextView mNoConnectionStub;
+    private Button mCreateChannelButton;
+    private Button mProfileButton;
 
     public static ChannelListFragment newInstance(Controller controller,
                                                   String userId,
@@ -91,7 +92,22 @@ public class ChannelListFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_channel_list, container, false);
-        mNoConnectionStub = (TextView) view.findViewById(R.id.no_connection_stub);
+        mCreateChannelButton = (Button) view.findViewById(R.id.btn_create_channel);
+        mProfileButton = (Button) view.findViewById(R.id.btn_profile);
+
+        mCreateChannelButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mController.showCreateChannelFragment(true);
+            }
+        });
+
+        mProfileButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mController.showChangeUserInfoFragment(true);
+            }
+        });
         return view;
     }
 

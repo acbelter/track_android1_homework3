@@ -28,4 +28,13 @@
     <string name="toast_user_out_of_channel">Current user out of channel</string>
     <string name="toast_user_not_found">User not found</string>
     <string name="channel_users">Channel users</string>
+    <string name="create_channel">Create</string>
+    <string name="profile">Profile</string>
+    <string name="channel_name">Channel name</string>
+    <string name="channel_description">Channel description</string>
+    <string name="toast_empty_status">Status is empty</string>
+    <string name="toast_info_changed">Info changed</string>
+    <string name="toast_empty_channel_name">Empty channel name</string>
+    <string name="toast_channel_created">Channel is created</string>
+    <string name="toast_channel_exist">This channel already exists</string>
 </resources>

@@ -34,7 +34,7 @@ public class UserListAdapter extends ArrayAdapter<User> {
 
             holder = new ViewHolder();
             holder.image = (ImageView) convertView.findViewById(R.id.image);
-            holder.nickname = (TextView) convertView.findViewById(R.id.title);
+            holder.nickname = (TextView) convertView.findViewById(R.id.name);
             convertView.setTag(holder);
         } else {
             holder = (ViewHolder) convertView.getTag();

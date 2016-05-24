@@ -16,19 +16,23 @@ import com.android1.homework3.msg.MessageAction;
 import com.android1.homework3.msg.Status;
 import com.android1.homework3.msg.request.AuthRequestMessage;
 import com.android1.homework3.msg.request.ChannelListRequestMessage;
+import com.android1.homework3.msg.request.CreateChannelRequestMessage;
 import com.android1.homework3.msg.request.EnterRequestMessage;
 import com.android1.homework3.msg.request.LeaveRequestMessage;
 import com.android1.homework3.msg.request.RegisterRequestMessage;
+import com.android1.homework3.msg.request.SetUserInfoRequestMessage;
 import com.android1.homework3.msg.request.UserInfoRequestMessage;
 import com.android1.homework3.msg.response.AuthResponseMessage;
 import com.android1.homework3.msg.response.Channel;
 import com.android1.homework3.msg.response.ChannelListResponseMessage;
+import com.android1.homework3.msg.response.CreateChannelResponseMessage;
 import com.android1.homework3.msg.response.EnterEventMessage;
 import com.android1.homework3.msg.response.EnterResponseMessage;
 import com.android1.homework3.msg.response.LastMessage;
 import com.android1.homework3.msg.response.LeaveEventMessage;
 import com.android1.homework3.msg.response.LeaveResponseMessage;
 import com.android1.homework3.msg.response.RegisterResponseMessage;
+import com.android1.homework3.msg.response.SetUserInfoResponseMessage;
 import com.android1.homework3.msg.response.User;
 import com.android1.homework3.msg.response.UserInfoResponseMessage;
 import com.android1.homework3.msg.response.WelcomeMessage;
@@ -62,6 +66,7 @@ public final class Controller {
                 break;
             }
             case MessageAction.CREATE_CHANNEL: {
+                processCreateChannelMessage((CreateChannelResponseMessage) message);
                 break;
             }
             case MessageAction.EVENT_ENTER: {
@@ -81,6 +86,7 @@ public final class Controller {
                 break;
             }
             case MessageAction.EVENT_MESSAGE: {
+                // TODO
                 break;
             }
             case MessageAction.REGISTER: {
@@ -88,6 +94,7 @@ public final class Controller {
                 break;
             }
             case MessageAction.SET_USER_INFO: {
+                processSetUserInfoMessage((SetUserInfoResponseMessage) message);
                 break;
             }
             case MessageAction.USER_INFO: {
@@ -476,6 +483,116 @@ public final class Controller {
         }
     }
 
+    private void processSetUserInfoMessage(SetUserInfoResponseMessage message) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        hideLoadingDialog();
+
+        switch (message.status) {
+            case ERR_OK: {
+                Logger.d("Successful change user info");
+                Toast.makeText(mainActivity, R.string.toast_info_changed, Toast.LENGTH_SHORT).show();
+                break;
+            }
+            case ERR_ALREADY_EXIST: {
+                break;
+            }
+            case ERR_INVALID_PASS: {
+                break;
+            }
+            case ERR_INVALID_DATA: {
+                break;
+            }
+            case ERR_EMPTY_FIELD: {
+                break;
+            }
+            case ERR_ALREADY_REGISTER: {
+                break;
+            }
+            case ERR_NEED_AUTH: {
+                showAuthFragment(false);
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_NEED_REGISTER: {
+                showRegisterFragment(false);
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_USER_NOT_FOUND: {
+                Toast.makeText(mainActivity.getApplicationContext(),
+                        R.string.toast_user_not_found, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_CHANNEL_NOT_FOUND: {
+                break;
+            }
+            case ERR_INVALID_CHANNEL: {
+                break;
+            }
+        }
+    }
+
+    private void processCreateChannelMessage(CreateChannelResponseMessage message) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        hideLoadingDialog();
+
+        switch (message.status) {
+            case ERR_OK: {
+                Logger.d("Successful create channel");
+                Toast.makeText(mainActivity, R.string.toast_channel_created, Toast.LENGTH_SHORT).show();
+                String userId = Pref.loadUserId(mPrefs);
+                String sessionId = Pref.loadSessionId(mPrefs);
+                getChannelList(userId, sessionId);
+                break;
+            }
+            case ERR_ALREADY_EXIST: {
+                Toast.makeText(mainActivity, R.string.toast_channel_exist, Toast.LENGTH_SHORT).show();
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_INVALID_PASS: {
+                break;
+            }
+            case ERR_INVALID_DATA: {
+                break;
+            }
+            case ERR_EMPTY_FIELD: {
+                break;
+            }
+            case ERR_ALREADY_REGISTER: {
+                break;
+            }
+            case ERR_NEED_AUTH: {
+                showAuthFragment(false);
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_NEED_REGISTER: {
+                showRegisterFragment(false);
+                mainActivity.connectToNetworkService();
+                break;
+            }
+            case ERR_USER_NOT_FOUND: {
+                break;
+            }
+            case ERR_CHANNEL_NOT_FOUND: {
+                break;
+            }
+            case ERR_INVALID_CHANNEL: {
+                break;
+            }
+        }
+    }
+
     public void processEnterEvent(EnterEventMessage message) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
@@ -645,6 +762,37 @@ public final class Controller {
         mainActivity.sendMessage(userInfoMessage);
     }
 
+    public void changeUserInfo(String status, String userId, String sessionId) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        showLoadingDialog();
+
+        SetUserInfoRequestMessage setUserInfoMessage = new SetUserInfoRequestMessage();
+        setUserInfoMessage.userStatus = status;
+        setUserInfoMessage.cid = userId;
+        setUserInfoMessage.sid = sessionId;
+        mainActivity.sendMessage(setUserInfoMessage);
+    }
+
+    public void createChannel(String channelName, String channelDescription, String userId, String sessionId) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        showLoadingDialog();
+
+        CreateChannelRequestMessage createChannelMessage = new CreateChannelRequestMessage();
+        createChannelMessage.name = channelName;
+        createChannelMessage.descr = channelDescription;
+        createChannelMessage.cid = userId;
+        createChannelMessage.sid = sessionId;
+        mainActivity.sendMessage(createChannelMessage);
+    }
+
     public void showSplashFragment(boolean addToBackStack) {
         MainActivity mainActivity = mMainActivityWeakRef.get();
         if (mainActivity == null) {
@@ -722,5 +870,30 @@ public final class Controller {
 
         replaceFragment(mainActivity, UserInfoFragment.newInstance(nickname, status),
                 UserInfoFragment.tag(), addToBackStack);
+    }
+
+    public void showChangeUserInfoFragment(boolean addToBackStack) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        String userId = Pref.loadUserId(mPrefs);
+        String sessionId = Pref.loadSessionId(mPrefs);
+        String login = Pref.loadLogin(mPrefs);
+        replaceFragment(mainActivity, ChangeInfoFragment.newInstance(this, userId, sessionId, login),
+                ChangeInfoFragment.tag(), addToBackStack);
+    }
+
+    public void showCreateChannelFragment(boolean addToBackStack) {
+        MainActivity mainActivity = mMainActivityWeakRef.get();
+        if (mainActivity == null) {
+            return;
+        }
+
+        String userId = Pref.loadUserId(mPrefs);
+        String sessionId = Pref.loadSessionId(mPrefs);
+        replaceFragment(mainActivity, CreateChannelFragment.newInstance(this, userId, sessionId),
+                CreateChannelFragment.tag(), addToBackStack);
     }
 }

@@ -90,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
         mController = new Controller(this);
 
         mLoadingDialog = new ProgressDialog(this);
+        mLoadingDialog.setCancelable(false);
         mLoadingDialog.setTitle(null);
         mLoadingDialog.setMessage(getString(R.string.loading_data));
         mLoadingDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);

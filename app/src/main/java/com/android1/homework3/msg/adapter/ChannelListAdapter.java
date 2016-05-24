@@ -37,7 +37,7 @@ public class ChannelListAdapter extends ArrayAdapter<Channel> {
 
             holder = new ViewHolder();
             holder.image = (ImageView) convertView.findViewById(R.id.image);
-            holder.title = (TextView) convertView.findViewById(R.id.title);
+            holder.title = (TextView) convertView.findViewById(R.id.name);
             holder.onlineUsers = (TextView) convertView.findViewById(R.id.online_users);
             holder.description = (TextView) convertView.findViewById(R.id.description);
             convertView.setTag(holder);

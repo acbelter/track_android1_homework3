@@ -9,14 +9,31 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.android1.homework3.R;
 
 public class ChangeInfoFragment extends Fragment {
+    private Controller mController;
+    private String mUserId;
+    private String mSessionId;
+    private String mLogin;
     private ImageView mAvatar;
-    private EditText mNickname;
-    private EditText mStatus;
+    private EditText mLoginEditText;
+    private EditText mStatusEditText;
     private Button mSaveButton;
+
+    public static ChangeInfoFragment newInstance(Controller controller,
+                                                 String userId,
+                                                 String sessionId,
+                                                 String login) {
+        ChangeInfoFragment fragment = new ChangeInfoFragment();
+        fragment.mController = controller;
+        fragment.mUserId = userId;
+        fragment.mSessionId = sessionId;
+        fragment.mLogin = login;
+        return fragment;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -27,15 +44,21 @@ public class ChangeInfoFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_user_info, container, false);
+        View view = inflater.inflate(R.layout.fragment_change_info, container, false);
         mAvatar = (ImageView) view.findViewById(R.id.avatar);
-        mNickname = (EditText) view.findViewById(R.id.nickname);
-        mStatus = (EditText) view.findViewById(R.id.status);
+        mLoginEditText = (EditText) view.findViewById(R.id.login);
+        mLoginEditText.setText(mLogin);
+        mStatusEditText = (EditText) view.findViewById(R.id.status);
         mSaveButton = (Button) view.findViewById(R.id.btn_save);
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                String newStatus = mStatusEditText.getText().toString().trim();
+                if (newStatus.isEmpty()) {
+                    Toast.makeText(getActivity(), R.string.toast_empty_status, Toast.LENGTH_SHORT).show();
+                } else {
+                    mController.changeUserInfo(newStatus, mUserId, mSessionId);
+                }
             }
         });
         return view;

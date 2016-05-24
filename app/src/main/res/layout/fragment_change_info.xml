@@ -20,12 +20,13 @@
             android:src="@drawable/image"/>
 
         <EditText
-            android:id="@+id/nickname"
+            android:id="@+id/login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/big_margin"
             android:layout_marginRight="@dimen/big_margin"
-            android:hint="@string/nickname"/>
+            android:enabled="false"
+            android:hint="@string/login"/>
 
         <EditText
             android:id="@+id/status"
