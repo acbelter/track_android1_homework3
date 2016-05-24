@@ -4,6 +4,7 @@ import com.android1.homework3.Logger;
 import com.android1.homework3.msg.BaseMessage;
 import com.android1.homework3.msg.MessageAction;
 import com.android1.homework3.msg.Status;
+import com.android1.homework3.msg.request.SendRequestMessage;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -59,6 +60,10 @@ public class JSONMessageParser implements MessageParser {
                 }
                 case MessageAction.WELCOME: {
                     return parseWelcomeMessage(json);
+                }
+                // TODO This message should not received!
+                case MessageAction.SEND_MESSAGE: {
+                    return new SendRequestMessage();
                 }
             }
         } catch (JSONException e) {

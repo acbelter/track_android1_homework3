@@ -2,6 +2,7 @@ package com.android1.homework3.net;
 
 import com.android1.homework3.Logger;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -64,11 +65,26 @@ public class SocketConnectionHandler implements ConnectionHandler {
             return;
         }
 
-        StreamProcessor streamProcessor = new JSONStreamProcessor();
+        DataProcessor dataProcessor = new JSONDataProcessor();
         final byte[] buf = new byte[1024 * 64];
         while (!Thread.currentThread().isInterrupted()) {
             try {
-                streamProcessor.read(mInputStream, buf, mListeners);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                int readBytesCount = mInputStream.read(buf);
+                Logger.d("Read bytes from socket: " + readBytesCount);
+
+                if (readBytesCount > 0) {
+                    baos.write(buf, 0, readBytesCount);
+                }
+
+                baos.flush();
+                baos.close();
+
+                String data = new String(baos.toByteArray(), "UTF-8");
+                for (SocketListener listener : mListeners) {
+                    listener.onDataReceived(data);
+                }
+                //dataProcessor.process(data, mListeners);
             } catch (Exception e) {
                 Logger.d("Failed to handle connection: " + e.getMessage());
                 for (SocketListener listener : mListeners) {

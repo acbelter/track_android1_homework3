@@ -630,9 +630,11 @@ public final class Controller {
             return;
         }
 
+        Logger.d("Process message event (" + message.chid + "): " + message.body);
+
         FragmentManager fm = mainActivity.getFragmentManager();
         ChannelFragment channelFragment =
-                (ChannelFragment) fm.findFragmentByTag(ChannelFragment.tag());
+                (ChannelFragment) fm.findFragmentByTag(ChannelFragment.tag(message.chid));
         if (channelFragment != null) {
             channelFragment.processMessage(message.chid, new ChannelMessage(message));
         }
@@ -875,7 +877,7 @@ public final class Controller {
         String sessionId = Pref.loadSessionId(mPrefs);
         replaceFragment(mainActivity, ChannelFragment.newInstance(this,
                 userId, sessionId, mLastEnterChannelId, users, lastMessages),
-                ChannelFragment.tag(), addToBackStack);
+                ChannelFragment.tag(mLastEnterChannelId), addToBackStack);
     }
 
     public void showUserListFragment(List<User> users,

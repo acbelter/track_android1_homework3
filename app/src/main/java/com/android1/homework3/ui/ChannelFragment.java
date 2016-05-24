@@ -80,6 +80,7 @@ public class ChannelFragment extends ListFragment {
                 String messageBody = mMessage.getText().toString();
                 if (!messageBody.isEmpty()) {
                     mController.send(messageBody, mChannelId, mUserId, mSessionId);
+                    mMessage.setText(null);
                 }
             }
         });
@@ -90,16 +91,16 @@ public class ChannelFragment extends ListFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mAdapter = new ChannelMessageAdapter(getActivity(), mUserId, mChannelMessages);
+        setListAdapter(mAdapter);
     }
 
     public void processMessage(String channelId, ChannelMessage message) {
         if (mChannelId != null && mChannelId.equals(channelId)) {
-            mChannelMessages.add(message);
-            mAdapter.notifyDataSetChanged();
+            mAdapter.add(message);
         }
     }
 
-    public static String tag() {
-        return ChannelFragment.class.getSimpleName();
+    public static String tag(String channelId) {
+        return ChannelFragment.class.getSimpleName() + "_" + channelId;
     }
 }
