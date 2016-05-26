@@ -5,28 +5,25 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 
 import java.io.IOException;
 
 import android1.homework3.INetworkService;
+import android1.homework3.INetworkServiceCallback;
 
 public class NetworkService extends Service implements SocketListener {
-    public static final String ACTION_CONNECTED = "com.android1.homework3.ACTION_CONNECTED";
-    public static final String ACTION_CONNECTION_FAILED = "com.android1.homework3.ACTION_CONNECTION_FAILED";
-    public static final String ACTION_DATA_RECEIVED = "com.android1.homework3.ACTION_DATA_RECEIVED";
     private static final String HOST = "188.166.49.215";
     private static final int PORT = 7777;
 
     private NetworkServiceBinder mNetworkServiceBinder;
     private SocketConnectionHandler mSocketConnectionHandler;
-    private LocalBroadcastManager mLocalBroadcastManager;
+
+    private INetworkServiceCallback mCallback;
 
     @Override
     public void onCreate() {
         super.onCreate();
         mNetworkServiceBinder = new NetworkServiceBinder();
-        mLocalBroadcastManager = LocalBroadcastManager.getInstance(this);
         mSocketConnectionHandler = new SocketConnectionHandler(HOST, PORT);
         mSocketConnectionHandler.addListener(this);
 
@@ -35,13 +32,23 @@ public class NetworkService extends Service implements SocketListener {
     }
 
     private void notifyConnected() {
-        Intent intent = new Intent(ACTION_CONNECTED);
-        mLocalBroadcastManager.sendBroadcast(intent);
+        if (mCallback != null) {
+            try {
+                mCallback.onConnected();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void notifyConnectionFailed() {
-        Intent intent = new Intent(ACTION_CONNECTION_FAILED);
-        mLocalBroadcastManager.sendBroadcast(intent);
+        if (mCallback != null) {
+            try {
+                mCallback.onConnectionFailed();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     @Override
@@ -75,9 +82,13 @@ public class NetworkService extends Service implements SocketListener {
 
     @Override
     public void onDataReceived(String data) {
-        Intent intent = new Intent(ACTION_DATA_RECEIVED);
-        intent.putExtra("data", data);
-        mLocalBroadcastManager.sendBroadcast(intent);
+        if (mCallback != null) {
+            try {
+                mCallback.onDataReceived(data);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private class NetworkServiceBinder extends INetworkService.Stub {
@@ -88,6 +99,11 @@ public class NetworkService extends Service implements SocketListener {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        @Override
+        public void setCallback(INetworkServiceCallback callback) throws RemoteException {
+            mCallback = callback;
         }
     }
 }

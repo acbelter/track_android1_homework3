@@ -2,16 +2,12 @@ package com.android1.homework3.ui;
 
 import android.app.FragmentTransaction;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -25,6 +21,7 @@ import com.android1.homework3.msg.response.MessageParser;
 import com.android1.homework3.net.NetworkService;
 
 import android1.homework3.INetworkService;
+import android1.homework3.INetworkServiceCallback;
 
 public class MainActivity extends AppCompatActivity {
     private INetworkService mNetworkService;
@@ -39,6 +36,11 @@ public class MainActivity extends AppCompatActivity {
         public void onServiceConnected(ComponentName name, IBinder service) {
             Logger.d("Connected to network service");
             mNetworkService = INetworkService.Stub.asInterface(service);
+            try {
+                mNetworkService.setCallback(mCallback);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
@@ -48,36 +50,32 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private BroadcastReceiver mNetworkServiceReceiver = new BroadcastReceiver() {
+    private INetworkServiceCallback mCallback = new INetworkServiceCallback.Stub() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            switch (intent.getAction()) {
-                case NetworkService.ACTION_CONNECTED: {
-                    Logger.d("Successful connection");
-                    mNetworkServiceConnected = true;
-                    break;
-                }
-                case NetworkService.ACTION_CONNECTION_FAILED: {
-                    Logger.d("Connection failed");
-                    mNetworkServiceConnected = false;
-                    mController.processConnectionFailed();
-                    Toast.makeText(getApplicationContext(), R.string.toast_connection_failed, Toast.LENGTH_SHORT).show();
-                    break;
-                }
-                case NetworkService.ACTION_DATA_RECEIVED: {
-                    String data = intent.getStringExtra("data");
-                    Logger.d("Received data: " + data);
-                    BaseMessage message = mMessageParser.parseMessage(data);
-                    if (message != null) {
-                        mController.processResponse(message);
-                    } else {
-                        Logger.d("Unknown message");
-                        mNetworkServiceConnected = false;
-                        mController.processConnectionFailed();
-                    }
-                    break;
-                }
+        public void onDataReceived(String data) throws RemoteException {
+            Logger.d("Received data in activity: " + data);
+            BaseMessage message = mMessageParser.parseMessage(data);
+            if (message != null) {
+                mController.processResponse(message);
+            } else {
+                Logger.d("Unknown message");
+                mNetworkServiceConnected = false;
+                mController.processConnectionFailed();
             }
+        }
+
+        @Override
+        public void onConnected() throws RemoteException {
+            Logger.d("Successful connection");
+            mNetworkServiceConnected = true;
+        }
+
+        @Override
+        public void onConnectionFailed() throws RemoteException {
+            Logger.d("Connection failed");
+            mNetworkServiceConnected = false;
+            mController.processConnectionFailed();
+            Toast.makeText(getApplicationContext(), R.string.toast_connection_failed, Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -146,24 +144,6 @@ public class MainActivity extends AppCompatActivity {
             unbindService(mServiceConnection);
             mNetworkService = null;
         }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        LocalBroadcastManager manager = LocalBroadcastManager.getInstance(this);
-        manager.registerReceiver(mNetworkServiceReceiver,
-                new IntentFilter(NetworkService.ACTION_CONNECTED));
-        manager.registerReceiver(mNetworkServiceReceiver,
-                new IntentFilter(NetworkService.ACTION_CONNECTION_FAILED));
-        manager.registerReceiver(mNetworkServiceReceiver,
-                new IntentFilter(NetworkService.ACTION_DATA_RECEIVED));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mNetworkServiceReceiver);
     }
 
     @Override
