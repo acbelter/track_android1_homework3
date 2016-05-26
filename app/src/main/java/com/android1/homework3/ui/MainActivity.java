@@ -24,8 +24,8 @@ import android1.homework3.INetworkService;
 import android1.homework3.INetworkServiceCallback;
 
 public class MainActivity extends AppCompatActivity {
+    private volatile boolean mNetworkServiceConnected;
     private INetworkService mNetworkService;
-    private boolean mNetworkServiceConnected;
     private MessageParser mMessageParser;
     private MessageBuilder mMessageBuilder;
     private Controller mController;
@@ -54,14 +54,19 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onDataReceived(String data) throws RemoteException {
             Logger.d("Received data in activity: " + data);
-            BaseMessage message = mMessageParser.parseMessage(data);
-            if (message != null) {
-                mController.processResponse(message);
-            } else {
-                Logger.d("Unknown message");
-                mNetworkServiceConnected = false;
-                mController.processConnectionFailed();
-            }
+            final BaseMessage message = mMessageParser.parseMessage(data);
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (message != null) {
+                        mController.processResponse(message);
+                    } else {
+                        Logger.d("Unknown message");
+                        mNetworkServiceConnected = false;
+                        mController.processConnectionFailed();
+                    }
+                }
+            });
         }
 
         @Override
@@ -74,8 +79,13 @@ public class MainActivity extends AppCompatActivity {
         public void onConnectionFailed() throws RemoteException {
             Logger.d("Connection failed");
             mNetworkServiceConnected = false;
-            mController.processConnectionFailed();
-            Toast.makeText(getApplicationContext(), R.string.toast_connection_failed, Toast.LENGTH_SHORT).show();
+            MainActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    mController.processConnectionFailed();
+                    Toast.makeText(getApplicationContext(), R.string.toast_connection_failed, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     };
 
