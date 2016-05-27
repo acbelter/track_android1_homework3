@@ -151,6 +151,11 @@ public class MainActivity extends AppCompatActivity {
 
     private void disconnect() {
         if (mNetworkService != null) {
+            try {
+                mNetworkService.setCallback(null);
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
             unbindService(mServiceConnection);
             mNetworkService = null;
         }
